@@ -1,74 +1,99 @@
-#include<Buffer.h>
+#include "Buffer.h"
 
 using namespace ChatRoom;
-
-int Buffer::Read(std::string& d)
+int Buffer::Read(std::string& des)
 {
-	d.clear();
-	if (getSize() > 0)
-		d.push_back(store_.begin(), store_.end());
-	return getSize();
+	des.clear();
+	int len = getLen();
+	if (len > 0)
+		for (int i = 0; i < len;i++)
+			des.push_back(store_[i]);
+
+	clear();
+	return len;
 }
 
-int Buffer::Read(Buffer& d)
+int Buffer::Read(Buffer& des)
 {
-	d.clear();
-	d.Write(getString());
-	return getSize();
+	des.Append(getString());
+	int len = getLen();
+	clear();
+	return len;
 }
 
-void Buffer::Read(std::string& d, int& len)
+void Buffer::Read(std::string& des, int& len)
 {
-	d.clear();
-	if (len > getSize())
-		len=Read(d);
-	else
-		d.push_back(store_.begin(), store_.begin() + len);
+	des.clear();
+	int size = getLen();
+	if (len > size)
+	{
+		len = Read(des);
+		return;
+	}
+		
+	for (int i = 0; i < len; i++)
+	{
+		des.push_back(store_[i]);
+		readIndex_++;
+	}	
+		
 }
 
-void Buffer::Read(Buffer& d, int& len)
+void Buffer::Read(Buffer& des, int& len)
 {
-	if (len > getSize())
-		len = Read(d);
+	int size = getLen();
+	if (len > size)
+		len = Read(des);
 	else
 	{
 		std::string tmp = getString();
-		d.Write(tmp.begin(), tmp.begin() + len);
+		des.Append(std::string(tmp.begin(), tmp.begin() + len));
+		readIndex_ += len;
 	}
 }
 
-
-void Buffer::Write(const std::string& s)
+void Buffer::Append(const std::string& s)
 {
 	int addLen = s.size();
-	store_.push_back(s.begin(), s.end());
-	size += addLen;
+	for (int i = 0; i < addLen;i++)
+		store_.push_back(s[i]);
+	writeIndex_ += addLen;
 }
 
-void Buffer::Write(const Buffer& s)
+void Buffer::Append(const Buffer& s)
 {
-	s.Write(s.getString());
+	Append(s.getString());
 }
 
-void Buffer::Write(const char* s)
+void Buffer::Append(const char* s)
 {
-	int addLen = strlen(s);
-	store_.push_back(s, s + addLen);
-	size += addLen;
+	if (s == nullptr)
+		return;
+
+	int i = 0;
+	while (s[i] != '\0')
+	{
+		store_.push_back(s[i]);
+		i++, writeIndex_++;
+	}
 }
 
-int Buffer::getSize()
+int Buffer::getLen() const
 {
-	return size_;
+	return writeIndex_-readIndex_;
 }
 
-std::string Buffer::getString()
+std::string Buffer::getString() const
 {
-	return std::string(store_.begin(), store_.end());
+	if (writeIndex_ == readIndex_)
+		return std::string();
+
+	int len = getLen();
+	return std::string(&store_[readIndex_], len);
 }
 
 void Buffer::clear()
 {
-	store_.clear();
-	size = 0;
+	readIndex_ = 0;
+	writeIndex_ = 0;
 }

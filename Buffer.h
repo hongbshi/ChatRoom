@@ -9,22 +9,29 @@ namespace ChatRoom
 {
 	class Buffer
 	{
-		public:
-			Buffer() :size_(0) {}
-			//Original data will be cleared  (All Read Function)
-			void Read(std::string& d); 
-			void Read(Buffer& d);
-			void Read(std::string& d,int& len);
-			void Read(Buffer& d, int& len);
-			void Write(const std::string& s);
-			void Write(const Buffer& s);
-			void Write(const char* s);
-			int getSize();
-			std::string getString();
-			void clear();
-		private:
-			vector<char> store_;
-			int size_;
-	}
+	public:
+		//Construct
+		Buffer() :readIndex_(0),writeIndex_(0) {}
+		//Original data will be cleared  
+		int Read(std::string& des);
+		//Append to Buffer
+		int Read(Buffer& des);
+		//Clear original data
+		void Read(std::string& des, int& len);
+		//Append to Buffer
+		void Read(Buffer& des, int& len);
+		//Write to Buffer
+		void Append(const std::string& src);
+		void Append(const Buffer& src);
+		void Append(const char* src);
+		//other Function
+		int getLen() const;
+		std::string getString() const;
+		void clear();
+	private:
+		std::vector<char> store_;
+		int readIndex_;
+		int writeIndex_;
+	};
 }
 #endif

@@ -15,8 +15,8 @@ Epoll::Epoll()
 	int number=epoll_wait(epollfd_, &event_, size, timeout);
 	if (0 < number)
 	{
-		fillActiveChannel(number,activeChannel);
-		if (number == size)
+		fillActiveChannel(activeChannel);
+		if (number == size && size<Epoll_Listen_Size)
 			event_.resize(2 * size);
 	}
 }
@@ -71,7 +71,13 @@ void Epoll::update(int operation,Channel* ch)
 		abort();
 }
 
-void Epoll::fillActiveChannel(int number, std::vector<Channel*>& activeChannel)
+void Epoll::fillActiveChannel(std::vector<Channel*>& activeChannel)
 {
-
+	int number = event_.size();
+	for (int i = 0; i < number; i++)
+	{
+		Channel* tmp = event_[i].data.ptr;
+		tmp->setReEvent(event_[i].events);
+		activeChannel.push_back(tmp);
+	}
 }

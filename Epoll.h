@@ -13,6 +13,7 @@ namespace ChatRoom
 	{
 	public:
 		Epoll();
+		//Add to activeChannel
 		void poll(int timeout,std::vector<Channel*>& activeChannel);
 		//If ch.status is kNew or kDeleted, add ch to listen. otherwise update the channel status.
 		void updateChannel(Channel* ch); 
@@ -22,13 +23,12 @@ namespace ChatRoom
 		bool hasChannel(Channel* ch);
 	private:
 		void update(int operation, Channel* ch);
-		void fillActiveChannel(int number,std::vector<Channel*>& activeChannel);
+		void fillActiveChannel(std::vector<Channel*>& activeChannel);
 		typedef std::vector<epoll_event> EventList;
 		int epollfd_;
 		EventList event_;
 		int initialSize;
 		std::map<int, Channel*> activeChannel_;   //fd,channel*
-
 	};
 }
 

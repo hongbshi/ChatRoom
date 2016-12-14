@@ -1,4 +1,5 @@
 #include "Epoll.h"
+#include "Channel.h"
 #include<assert.h>
 using namespace ChatRoom;
 
@@ -64,7 +65,7 @@ bool Epoll::hasChannel(Channel* ch)
 void Epoll::update(int operation,Channel* ch)
 {
 	struct epoll_event event;
-	memset(&event, sizeof(event));
+	memset(&event,0, sizeof(event));
 	event.events = ch->getEvent();
 	event.data.ptr = ch;
 	if (epoll_ctl(epollfd_, operation, ch->getfd(), event) < 0)

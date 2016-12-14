@@ -2,18 +2,17 @@
 #define ChatRoom_MutexLock_H
 
 #include<pthread.h>
-namespace chatRoom
+namespace ChatRoom
 {
 	class MutexLock
 	{
-
 	public:
-
-
+		MutexLock();
+		void Lock();
+		void unLock();
+		~MutexLock();
 	private:
-
+		pthread_mutex_t mutex_;
 	};
 }
-
-
 #endif // ! ChatRoom_MUTEXLOCK_H

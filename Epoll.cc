@@ -1,6 +1,7 @@
 #include "Epoll.h"
 #include "Channel.h"
 #include<assert.h>
+#include<string.h>
 using namespace ChatRoom;
 
 Epoll::Epoll()
@@ -13,7 +14,7 @@ Epoll::Epoll()
  void Epoll::poll(int timeout,std::vector<Channel*>& activeChannel)
 {
 	int size = event_.size();
-	int number=epoll_wait(epollfd_, &event_, size, timeout);
+	int number=epoll_wait(epollfd_, &*event_.begin(), size, timeout);
 	if (0 < number)
 	{
 		fillActiveChannel(activeChannel);
@@ -68,7 +69,7 @@ void Epoll::update(int operation,Channel* ch)
 	memset(&event,0, sizeof(event));
 	event.events = ch->getEvent();
 	event.data.ptr = ch;
-	if (epoll_ctl(epollfd_, operation, ch->getfd(), event) < 0)
+	if (epoll_ctl(epollfd_, operation, ch->getfd(),&event) < 0)
 		abort();
 }
 
@@ -77,7 +78,7 @@ void Epoll::fillActiveChannel(std::vector<Channel*>& activeChannel)
 	int number = event_.size();
 	for (int i = 0; i < number; i++)
 	{
-		Channel* tmp = event_[i].data.ptr;
+		Channel* tmp =static_cast<Channel*>(event_[i].data.ptr);
 		tmp->setReEvent(event_[i].events);
 		activeChannel.push_back(tmp);
 	}

@@ -2,6 +2,7 @@
 #define ChatRoom_Channel_H
 
 #include<sys/epoll.h>
+#include<functional>
 namespace ChatRoom
 {
 	const int kNew = -1;
@@ -10,21 +11,21 @@ namespace ChatRoom
 	class Channel
 	{
 	public:
-		typedef void(*EventCallback)();
+		typedef std::function<void()> EventCallback;
 		Channel(int fd);
-		void setReadCallback(EventCallback& rcb)
+		void setReadCallback(const EventCallback& rcb)
 		{
 			readCallback_ = rcb;
 		}
-		void setWriteCallback(EventCallback& wcb)
+		void setWriteCallback(const EventCallback& wcb)
 		{
 			writeCallback_ = wcb;
 		}
-		void setCloseCallback(EventCallback& ccb)
+		void setCloseCallback(const EventCallback& ccb)
 		{
 			closeCallback_ = ccb;
 		}
-		void setErrorCallback(EventCallback& ecb)
+		void setErrorCallback(const EventCallback& ecb)
 		{
 			errorCallback_ = ecb;
 		}

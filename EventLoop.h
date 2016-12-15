@@ -3,8 +3,9 @@
 
 #include<vector>
 #include<memory>
-#include<unistd>
+#include<unistd.h>
 #include "MutexLock.h"
+#include "MutexLockGuard.h"
 namespace ChatRoom
 {
 	class Channel;
@@ -12,29 +13,39 @@ namespace ChatRoom
 	class EventLoop
 	{
 	public:
-		typedef void(*Functor)();
+		typedef std::function<void()> Functor;
 		EventLoop();
 		void loop();
+		void quit()
+		{
+			quit_ = true;
+			if (!isInLoopthread())
+				wakeup();
+		}
+		void setEpollTimeoutMs(int timeout)
+		{
+			MutexLockGuard guard(mutex_);
+			kEpollTimeoutMs_ = timeout;
+		}
+		void runInLoop(Functor& fun);
+		void queueInLoop(Functor& fun);
+		//Thread safe
+		bool isInLoopthread();
+	private:
+		//internal use
 		void wakeup();
 		void removeChannle(Channel* ch);
 		void updateChannle(Channel* ch);
 		bool hasChannel(Channel* ch);
-		void setEpollTimeoutMs(int timeout)
-		{
-			kEpollTimeoutMs_ = timeout;
-		}
-		void quit()
-		{
-			quit_ = true;
-		}
-		void pendingFunctor(Functor& fun);
-	private:
-		void pendingFunctorGuard(Functor& fun);
+		void doPendingFunctors();
+		void wakeupChannelReadCallback();
+		//internal variable
 		int kEpollTimeoutMs_;
 		pid_t tid_;
 		//status
 		bool looping_;
 		bool quit_;
+		bool callingPendingFunctors_;
 		//wakeup the loop
 		//eventfd
 		int wakeupfd_;  

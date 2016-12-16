@@ -2,6 +2,7 @@
 #include<stdio.h>
 #include<functional>
 #include<pthread.h>
+#include<unistd.h>
 #include "EventLoop.h"
 #include "MutexLock.h"
 #include "MutexLockGuard.h"
@@ -22,12 +23,15 @@ void* ChildThread(void*)
         std::cout<<getCurrentThreadTid()<<std::endl;
 	childEventLoop.loop();
 	std::cout<<"The Child Thread quit"<<std::endl;
+	std::cout<<std::endl;
         return NULL;
 }
 void insertFun()
 {
 	std::cout<<"This is insertFun"<<std::endl;
+	std::cout<<"Excuted Thread tid is:"<<std::endl;
 	std::cout<<getCurrentThreadTid()<<std::endl;
+	std::cout<<std::endl;
 }
 int main()
 {
@@ -41,10 +45,9 @@ int main()
 			flag=true;
 	}
 	std::function<void()> insert(insertFun);
-	//Child Thread not in poll,parent thread excute quit,what happend?
 	childLoop->runInLoop(insert);
 	childLoop->quit();
-	pthread_join(child,NULL);
+        pthread_join(child,NULL);
 	std::cout<<"The main Thread quit"<<std::endl;
 
 }

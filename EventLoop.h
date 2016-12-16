@@ -4,6 +4,7 @@
 #include<vector>
 #include<memory>
 #include<unistd.h>
+#include<functional>
 #include "MutexLock.h"
 #include "MutexLockGuard.h"
 namespace ChatRoom
@@ -18,17 +19,18 @@ namespace ChatRoom
 		void loop();
 		void quit()
 		{
-			quit_ = true;
-			if (!isInLoopthread())
-				wakeup();
+			//quit_ = true;
+			//if (!isInLoopthread())
+				//wakeup();
+			queueInLoop(std::bind(&EventLoop::quitCore,this));
 		}
-		void setEpollTimeoutMs(int timeout)
+		void setEpollTimeoutMs(const int timeout)
 		{
 			MutexLockGuard guard(mutex_);
 			kEpollTimeoutMs_ = timeout;
 		}
-		void runInLoop(Functor& fun);
-		void queueInLoop(Functor& fun);
+		void runInLoop(const Functor& fun);
+		void queueInLoop(const Functor& fun);
 		//Thread safe
 		bool isInLoopthread();
 	private:
@@ -39,6 +41,10 @@ namespace ChatRoom
 		bool hasChannel(Channel* ch);
 		void doPendingFunctors();
 		void wakeupChannelReadCallback();
+		void quitCore()
+		{
+			quit_=true;
+		}
 		//internal variable
 		int kEpollTimeoutMs_;
 		pid_t tid_;

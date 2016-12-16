@@ -15,13 +15,13 @@ EventLoop::EventLoop()
 {
 	if (t_loopInThisThread)
 		abort();  //To Do
-	kEpollTimeoutMs_ = 10000;
+	kEpollTimeoutMs_ = 1000;
 	tid_ = getCurrentThreadTid();
 	t_loopInThisThread = true;
 	looping_ = false;
 	quit_ = false;
 	callingPendingFunctors_ = false;
-	wakeupfd_ = eventfd(0, 0);
+	wakeupfd_ = eventfd(0, EFD_NONBLOCK|EFD_CLOEXEC);
 	wakeupChannel_=std::make_shared<Channel>(wakeupfd_);
 	wakeupChannel_->enableRead();
 	epoll_ = std::make_shared<Epoll>();
@@ -72,7 +72,7 @@ bool ChatRoom::EventLoop::isInLoopthread()
 	return tid_ == ChatRoom::getCurrentThreadTid();
 }
 
-void ChatRoom::EventLoop::runInLoop(Functor & fun)
+void ChatRoom::EventLoop::runInLoop(const Functor & fun)
 {
 	if (isInLoopthread())
 		fun();
@@ -80,7 +80,7 @@ void ChatRoom::EventLoop::runInLoop(Functor & fun)
 		queueInLoop(fun);
 }
 
-void ChatRoom::EventLoop::queueInLoop(Functor& fun)
+void ChatRoom::EventLoop::queueInLoop(const Functor& fun)
 {
 	{
 		MutexLockGuard guard(mutex_);

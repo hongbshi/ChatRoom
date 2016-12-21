@@ -101,7 +101,6 @@ namespace ChatRoom
 		int reEvent_;    //receive event from epoll 
 		int fd_;        //listen fd
 		int status_; //for epoll to use
-		
 	};
 }
 #endif // ! ChatRoom_Channel_H

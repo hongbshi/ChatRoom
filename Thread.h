@@ -8,5 +8,13 @@
 namespace ChatRoom
 {
 	pid_t getCurrentThreadTid();
+
+	class Thread
+	{
+	public:
+
+	private:
+
+	};
 }
 #endif // ! ChatRoom_Thread_H

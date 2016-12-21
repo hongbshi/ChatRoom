@@ -33,12 +33,12 @@ namespace ChatRoom
 		void queueInLoop(const Functor& fun);
 		//Thread safe
 		bool isInLoopthread();
-	private:
 		//internal use
 		void wakeup();
 		void removeChannle(Channel* ch);
 		void updateChannle(Channel* ch);
 		bool hasChannel(Channel* ch);
+	private:
 		void doPendingFunctors();
 		void wakeupChannelReadCallback();
 		void quitCore()

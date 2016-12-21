@@ -23,6 +23,7 @@ namespace ChatRoom
 		TcpConnection(EventLoop* loop,int sockfd,
 		struct sockaddr_in localAddress,
 		struct sockaddr_in peerAddress);
+
 		//when connect was completed,it was been called.
 		void setConnectedCallback(const ConnectedCallback& cb)
 		{
@@ -44,13 +45,19 @@ namespace ChatRoom
 			messageCallback_ = cb;
 		}
 
-		bool connected() { return sockState_ == kConnected; }
-		bool disConnected() { return sockState_ == kDisconnected; }
+		void connectEstablished();
+		void connectDestroyed();
 
-		void startRead();
-		void stopRead();
+		//void startRead();
+		//void stopRead();
 
-		void shutdown();
+		void send(std::string& s);
+		void send(std::string&& s);
+		void send(Buffer& buff);
+		void send(Buffer&& buff);
+
+		void close();
+		void shutdownWrite();
 		void forceClose();
 
 		Buffer* getInputBuffer() { return &inputBuffer_; }
@@ -59,11 +66,8 @@ namespace ChatRoom
 		const struct sockaddr_in& getLocalAddress() { return localAddress_; }
 		const struct sockaddr_in& getPeerAddress() { return peerAddress_; }
 
-		void send(std::string& s);
-		void send(std::string&& s);
-		void send(Buffer& buff);
-		void send(Buffer&& buff);
-		
+		bool connected() { return sockState_ == kConnected; }
+		bool disConnected() { return sockState_ == kDisconnected; }
 	private:
 		void handleRead();
 		void handleWrite();

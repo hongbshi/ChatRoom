@@ -12,10 +12,11 @@ namespace ChatRoom
 	public:
 		TcpServer(EventLoop* loop, const struct sockaddr* listenAddr, bool reusePort);
 	private:
+		void newConnection(int sockfd, struct sockaddr* clientAddr);
 		EventLoop* loop_;
 		std::shared_ptr<Acceptor> acceptor_;
-		std::map<Thread, TcpConnection> conn_;
-
+		ThreadPool threadPool_;
+		//std::map<TcpConnection> conn_;
 	};
 }
 #endif // ! ChatRoom_TcpServer_H

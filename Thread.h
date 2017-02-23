@@ -8,33 +8,27 @@
 #include<string>
 #include<functional>
 #include "MutexLock.h"
+#include "Condition.h"
 namespace ChatRoom
 {
 	pid_t getCurrentThreadTid();
-
+	class EventLoop;
 	class Thread
 	{
 	public:
 		typedef std::function<void()> ThreadFunctor;
-		Thread(ThreadFunctor fun);
+		Thread(ThreadFunctor initialCallback=0);
 		~Thread();
-		int start();
-		void join();
-		std::string getName();
-		pid_t getTid();
-		pthread_t getThreadId();
-		bool isStart();
-		bool isJoin();
+		EventLoop* startloop();
 	private:
-		std::string defaultName();
-		ThreadFunctor startFun_;
-		std::string name_;
-		std::shared_ptr<pid_t> tid_;
+		//子线程执行
+		void run();
+		ThreadFunctor initialFun_;
+		pid_t tid_;
 		pthread_t pthreadId_;
-		bool start_;
-		bool join_;
+		EventLoop* loop_;
 		MutexLock mutex_;
-		static int incrementNumber;
+		Condition cond_;
 	};
 }
 #endif // ! ChatRoom_Thread_H

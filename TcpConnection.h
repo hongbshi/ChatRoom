@@ -62,6 +62,7 @@ namespace ChatRoom
 
 		Buffer* getInputBuffer() { return &inputBuffer_; }
 		Buffer* getOutputBuffer() { return &outputBuffer_; }
+		EventLoop* getLoop() { return loop_; }
 
 		const struct sockaddr_in& getLocalAddress() { return localAddress_; }
 		const struct sockaddr_in& getPeerAddress() { return peerAddress_; }

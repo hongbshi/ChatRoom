@@ -16,6 +16,11 @@ void MutexLock::unLock()
 	pthread_mutex_unlock(&mutex_);
 }
 
+pthread_mutex_t * ChatRoom::MutexLock::getPthreadMutex()
+{
+	return &mutex_;
+}
+
 MutexLock::~MutexLock()
 {
 	pthread_mutex_destroy(&mutex_);

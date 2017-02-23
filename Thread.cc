@@ -1,5 +1,7 @@
-#include"Thread.h"
+#include "Thread.h"
+#include "EventLoop.h"
 #include "MutexLockGuard.h"
+#include "Condition.h"
 #include<cstddef>
 #include<sys/syscall.h>
 #include<unistd.h>
@@ -19,9 +21,8 @@ namespace ChatRoom
 		initial()
 		{
 			_tId = static_cast<pid_t>(::syscall(SYS_gettid));
-		        pthread_atfork(NULL, NULL, &afterfork);
+		    pthread_atfork(NULL, NULL, &afterfork);
 		}
-
 	};
 	initial ini;
 	pid_t getCurrentThreadTid()
@@ -32,58 +33,72 @@ namespace ChatRoom
 	}
 
 	////////////////////////////////
-	int  ChatRoom::Thread::incrementNumber=1;
-	ChatRoom::Thread::Thread(ThreadFunctor fun)
+	ChatRoom::Thread::Thread(ThreadFunctor initialCallback = 0):mutex_(),cond_(mutex_)
 	{
-		startFun_ = fun;
-		name_ = defaultName();
-		tid_ = std::make_shared<pid_t>(0);
+		initialFun_ = initialCallback;
+		tid_ = nullptr;
 		pthreadId_=0;
-		start_ = false;
-		join_ = false;
+		loop_ = nullptr;
+	}
+
+	Thread::~Thread()
+	{
+		loop_->quit();
 	}
 
 	struct ThreadData
 	{
 		typedef ChatRoom::Thread::ThreadFunctor ThreadFunctor;
 		ThreadFunctor fun_;
-		std::string name_;
-		std::weak_ptr<pid_t> tid_;
-		ThreadData(ThreadFunctor fun, const std::string& name, std::shared_ptr<pid_t> tid)
+		ThreadData(ThreadFunctor fun)
 		{
 			fun_ = fun;
-			name_ = name;
-			tid_ = tid;
 		}
 	};
 
-	int Thread::start()
+	EventLoop* Thread::startloop()
 	{
-		ThreadData* data=new ThreadData(startFun_, name_, tid_);
+		ThreadData* data=new ThreadData(std::bind(&Thread::run,this));
 		int result = pthread_create(&pthreadId_, NULL, &internalThreadStart, data);
 		if (result < 0)
 		{
 			//deal error
 			delete data;
+			return nullptr;
 		}
-		return result;
+		else
+		{
+			//循环等待子线程
+			MutexLockGuard guard(mutex_);
+			while (loop_ == nullptr)
+				cond_.wait();
+			return loop_;
+		}
+	}
+
+	void Thread::run()
+	{
+		tid_ = getCurrentThreadTid();
+		EventLoop loop;
+		//通知父线程
+		{
+			MutexLockGuard guard(mutex_);
+			loop_ = &loop;
+			cond_.notify();
+		}
+		//执行initialcallback
+		if (initialFun_)
+			initialFun_();
+		//执行事件循环
+		loop.loop();
 	}
 
 	void* internalThreadStart(void* data)
 	{
-		ThreadData* thread = (ThreadData*)(data);
-		//lock weak_ptr, write tid for Thread
+		ThreadData* threadData = (ThreadData*)(data);
 		//run the fun
-	}
-
-	std::string Thread::defaultName()
-	{
-		int num;
-		{
-			MutexLockGuard guard(mutex_);
-			num=incrementNumber++;
-		}
-		return std::string();
+		threadData->fun_();
+		delete threadData;
 	}
 }
 

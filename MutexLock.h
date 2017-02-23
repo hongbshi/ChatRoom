@@ -10,6 +10,7 @@ namespace ChatRoom
 		MutexLock();
 		void Lock();
 		void unLock();
+		pthread_mutex_t* getPthreadMutex();
 		~MutexLock();
 	private:
 		pthread_mutex_t mutex_;

@@ -20,7 +20,7 @@ ChatRoom::Acceptor::Acceptor(EventLoop * loop, const sockaddr * listenAddr, bool
 	channel_.setReadCallback(std::bind(&Acceptor::handleRead, this));
 }
 
-void ChatRoom::Acceptor::setNewConnectCallback(NewConnectCallback & cb)
+void ChatRoom::Acceptor::setNewConnectCallback(NewConnectCallback && cb)
 {
 	newConnectCallback_ = cb;
 }

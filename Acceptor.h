@@ -13,7 +13,7 @@ namespace ChatRoom
 	public:
 		typedef std::function<void(int sockfd,const struct sockaddr& clientAddr)> NewConnectCallback;
 		Acceptor(EventLoop* loop,const struct sockaddr* listenAddr,bool reusePort);
-		void setNewConnectCallback(NewConnectCallback& cb);
+		void setNewConnectCallback(NewConnectCallback&& cb);
 		bool isListening();
 		void listen();
 		~Acceptor();

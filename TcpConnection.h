@@ -9,8 +9,13 @@
 namespace ChatRoom
 {
 	//have connected
-	class TcpConnection
+	class TcpConnection:public std::enable_shared_from_this<TcpConnection>
 	{
+	private:
+		enum sockStates
+		{
+			kConnecting, kConnected, kDisconnecting, kDisconnected
+		};
 	public:
 		typedef std::shared_ptr<TcpConnection> TcpConnectionPtr;
 		typedef std::function<void(TcpConnectionPtr)> ConnectedCallback;
@@ -22,7 +27,7 @@ namespace ChatRoom
 
 		TcpConnection(EventLoop* loop,int sockfd,
 		struct sockaddr_in localAddress,
-		struct sockaddr_in peerAddress);
+		struct sockaddr_in peerAddress,const std::string& name);
 		~TcpConnection();
 
 		//when connect was completed,it was been called.
@@ -46,6 +51,9 @@ namespace ChatRoom
 			messageCallback_ = cb;
 		}
 
+		void setStates(sockStates states) { sockState_ = states; }
+		static int getNumber() { return ++number; }
+		const std::string& getName() { return name_; }
 		void connectEstablished();
 		void connectDestroyed();
 
@@ -56,6 +64,7 @@ namespace ChatRoom
 
 		void close();
 		void shutdownWrite();
+		//start the read and stop the read
 		void startRead();
 		void stopRead();
 		//void forceClose();
@@ -79,14 +88,11 @@ namespace ChatRoom
 		void closeInLoop();
 		void startReadInLoop();
 		void stopReadInLoop();
-		enum sockStates
-		{
-			kConnecting, kConnected, kDisconnecting, kDisconnected
-		};
 		EventLoop* loop_;
 		int sockfd_;
 		struct sockaddr_in localAddress_;
 		struct sockaddr_in peerAddress_;
+		std::string name_;
 
 		sockStates sockState_;
 		std::shared_ptr<Channel> channel_;
@@ -97,6 +103,8 @@ namespace ChatRoom
 
 		Buffer inputBuffer_;
 		Buffer outputBuffer_;
+
+		static int number;
 	};
 }
 #endif // ! ChatRoom_TcpConnection_H

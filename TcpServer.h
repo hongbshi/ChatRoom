@@ -12,10 +12,11 @@ namespace ChatRoom
 	{
 	public:
 		typedef std::function<void()> Functor;
-		typedef void MessageCallback(struct sockaddr* localAddr, struct sockaddr* peerAddr);
-		typedef void NewConnectionCallback();
-		typedef void WriteCompleteCallback();
-		typedef void CloseCallback();
+		typedef std::shared_ptr<TcpConnection> TcpConnectionPtr;
+		typedef std::function<void(TcpConnectionPtr ptr, const Buffer* const buff)> MessageCallback;
+		typedef std::function<void(TcpConnectionPtr ptr)> NewConnectionCallback;
+		//typedef std::function<void(TcpConnectionPtr ptr)> WriteCompleteCallback();
+		typedef std::function<void(TcpConnectionPtr ptr)> CloseCallback;
 		typedef std::shared_ptr<TcpConnection> TcpConnectionPtr;
 		TcpServer(EventLoop* loop, const struct sockaddr* listenAddr, bool reusePort=false);
 	
@@ -24,7 +25,7 @@ namespace ChatRoom
 
 		void setNewConnectionCallback(NewConnectionCallback && cb);
 		void setMessageCallback(MessageCallback &&cb);
-		void setWriteCompleteCallback(WriteCompleteCallback &&cb);
+		//void setWriteCompleteCallback(WriteCompleteCallback &&cb);
 		void setCloseCallback(CloseCallback &&cb);
 		void start();
 	private:
@@ -40,10 +41,10 @@ namespace ChatRoom
 		Functor threadInitialCallback_;
 		std::shared_ptr<Acceptor> acceptor_;
 		std::shared_ptr<ThreadPool> threadPool_;
-		std::map<TcpConnectionPtr,std::string> conn_;
+		std::map<std::string, TcpConnectionPtr> conn_;
 		NewConnectionCallback newConnectionCallback_;
 		MessageCallback messageCallback_;
-		WriteCompleteCallback writeCompleteCallback_;
+		//WriteCompleteCallback writeCompleteCallback_;
 		CloseCallback closeCallback_;
 	};
 }

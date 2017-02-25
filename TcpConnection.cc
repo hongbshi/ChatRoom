@@ -1,18 +1,17 @@
 #include "TcpConnection.h"
 #include "Socket.h"
 #include<memory>
+#include<stdlib.h>
+#include<assert.h>
+#include <unistd.h>
 using namespace ChatRoom;
-
+int ChatRoom::TcpConnection::number = 1;
 ChatRoom::TcpConnection::TcpConnection(EventLoop * loop, int sockfd, 
 	sockaddr_in localAddress, 
-	sockaddr_in peerAddress)
+	sockaddr_in peerAddress,const std::string& name):loop_(loop),sockfd_(sockfd),
+	localAddress_(localAddress), peerAddress_(peerAddress),name_(name),
+	sockState_(kConnecting), channel_(std::make_shared<Channel>(sockfd_))
 {
-	loop_ = loop;
-	sockfd_ = sockfd;
-	localAddress_ = localAddress;
-	peerAddress_ = peerAddress;
-	sockState_=kConnecting;
-	channel_=std::make_shared<Channel>(sockfd_);
 	connectedCallback_=NULL;
 	closeCallback_ = NULL;
 	writeCallback_ = NULL;
@@ -29,7 +28,8 @@ ChatRoom::TcpConnection::~TcpConnection()
 // Must in TcpConnection loop
 void ChatRoom::TcpConnection::connectEstablished()
 {
-	sockState_ = kConnected;
+	assert(sockState_ == kConnecting);
+	setStates(kConnected);
 	channel_->enableRead();
 	loop_->updateChannle(&*channel_);
 	if (connectedCallback_)
@@ -38,33 +38,31 @@ void ChatRoom::TcpConnection::connectEstablished()
 // Must in TcpConnection loop
 void ChatRoom::TcpConnection::connectDestroyed()
 {
-	sockState_ = kDisconnected;
-	channel_->disableAll();
+	if (sockState_ == kConnected)
+	{
+		channel_->disableAll();
+	}
 	loop_->removeChannle(&*channel_);
-	TcpConnectionPtr guard(shared_from_this());
-	if (connectedCallback_)
-		connectedCallback_(guard);
-	//tcpserver 提供一个函数 用于 从tcpserver 中删除 tcpconnection智能指针
 }
 
 void ChatRoom::TcpConnection::startRead()
 {
-	loop_->runInLoop(std::bind(&TcpConnection::startReadInLoop, shard_from_this()));
+	loop_->runInLoop(std::bind(&TcpConnection::startReadInLoop, shared_from_this()));
 }
 
 void ChatRoom::TcpConnection::stopRead()
 {
-	loop_->runInLoop(std::bind(&TcpConnection::stopReadInLoop, shard_from_this()));
+	loop_->runInLoop(std::bind(&TcpConnection::stopReadInLoop, shared_from_this()));
 }
 
 void ChatRoom::TcpConnection::close()
 {
-	loop_->runInLoop(std::bind(&TcpConnection::closeInLoop, shard_from_this()));
+	loop_->runInLoop(std::bind(&TcpConnection::closeInLoop, shared_from_this()));
 }
 
 void ChatRoom::TcpConnection::shutdownWrite()
 {
-	loop_->runInLoop(std::bind(&TcpConnection::shutdownWriteInLoop, shard_from_this()));
+	loop_->runInLoop(std::bind(&TcpConnection::shutdownWriteInLoop, shared_from_this()));
 }
 
 //void ChatRoom::TcpConnection::forceClose()
@@ -99,12 +97,7 @@ void ChatRoom::TcpConnection::handleRead()
 	if (result > 0 && messageCallback_)
 		messageCallback_(shared_from_this());
 	else if (result == 0)
-	{
-		if (sockState_ == kConnected)
-			handleClose();
-		else
-			connectDestroyed();
-	}	
+		handleClose();	
 	else
 	{
 		errno = Errno;
@@ -138,18 +131,20 @@ void ChatRoom::TcpConnection::handleWrite()
 void ChatRoom::TcpConnection::handleError()
 {
 	//log something
-	connectDestroyed();
+	::exit(-1);
 }
 
 void ChatRoom::TcpConnection::handleClose()
 {
-	if (sockState_ == kConnected)
-	{
-		sockState_ = kDisconnecting;
-		shutdownWriteInLoop();
-	}
+	assert(sockState_ == kConnected || sockState_ == kDisconnecting);
+	setStates(kDisconnected);
+	channel_->disableAll();
+	TcpConnectionPtr guard(shared_from_this());
+	if (connectedCallback_)
+		connectedCallback_(guard);
+	//tcpserver 提供一个函数 用于 从tcpserver 中删除 tcpconnection智能指针
 	if (closeCallback_)
-		closeCallback_(shared_from_this());
+		closeCallback_(guard);
 }
 
 void ChatRoom::TcpConnection::sendInLoop(std::string & s)
@@ -166,11 +161,13 @@ void ChatRoom::TcpConnection::shutdownWriteInLoop()
 	shutdownSocket(sockfd_, SHUT_WRONLY);
 	channel_->disableWrite();
 	loop_->updateChannle(&*channel_);
+	setStates(kDisconnecting);
 }
 
 void ChatRoom::TcpConnection::closeInLoop()
 {
-	connectDestroyed();
+	setStates(kDisconnecting);
+	handleClose();
 }
 
 void ChatRoom::TcpConnection::startReadInLoop()

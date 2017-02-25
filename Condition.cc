@@ -1,9 +1,8 @@
 #include "Condition.h"
 #include "MutexLock.h"
-ChatRoom::Condition::Condition(MutexLock & lock)
+ChatRoom::Condition::Condition(MutexLock & lock):lock_(lock)
 {
 	pthread_cond_init(&cond_, nullptr);
-	lock_ = lock;
 }
 
 ChatRoom::Condition::~Condition()

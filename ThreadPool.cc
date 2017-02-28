@@ -2,10 +2,11 @@
 #include "Thread.h"
 #include "EventLoop.h"
 
-ChatRoom::ThreadPool::ThreadPool(ThreadFunctor initialCallback=0, const unsigned int threadNum=1)
-	:startFun_(initialCallback),threadNum_(threadNum),loops_(threadNum,nullptr)
+ChatRoom::ThreadPool::ThreadPool(EventLoop* loop,
+	ThreadFunctor initialCallback, const unsigned int threadNum)
+	:loop_(loop),startFun_(initialCallback),
+	threadNum_(threadNum),loops_(threadNum,nullptr),nextNum_(0)
 {
-	nextNum_ = 0;
 	for (int i = 0; i < threadNum_; ++i)
 		threads_.push_back(std::make_shared<Thread>(startFun_));
 }
@@ -28,7 +29,7 @@ using namespace ChatRoom;
 EventLoop* ChatRoom::ThreadPool::getNext()
 {
 	if(!threadNum_)
-		return nullptr;
+		return loop_;
 	else
 	{
 		EventLoop* tmp=loops_[nextNum_];

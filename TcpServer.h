@@ -13,7 +13,7 @@ namespace ChatRoom
 	public:
 		typedef std::function<void()> Functor;
 		typedef std::shared_ptr<TcpConnection> TcpConnectionPtr;
-		typedef std::function<void(TcpConnectionPtr ptr, const Buffer* const buff)> MessageCallback;
+		typedef std::function<void(TcpConnectionPtr ptr, Buffer* buff)> MessageCallback;
 		typedef std::function<void(TcpConnectionPtr ptr)> NewConnectionCallback;
 		//typedef std::function<void(TcpConnectionPtr ptr)> WriteCompleteCallback();
 		typedef std::function<void(TcpConnectionPtr ptr)> CloseCallback;
@@ -21,7 +21,7 @@ namespace ChatRoom
 		TcpServer(EventLoop* loop, const struct sockaddr* listenAddr, bool reusePort=false);
 	
 		void setThreadNum(const unsigned int num);
-		void setThreadInitialCallback(Functor initial);
+		void setThreadInitialCallback(Functor& initial);
 
 		void setNewConnectionCallback(NewConnectionCallback && cb);
 		void setMessageCallback(MessageCallback &&cb);

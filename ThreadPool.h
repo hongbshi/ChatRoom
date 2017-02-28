@@ -11,13 +11,14 @@ namespace ChatRoom
 	{
 	public:
 		typedef std::function<void()> ThreadFunctor;
-		ThreadPool(ThreadFunctor initialCallback=0,const unsigned int threadNum=1);
+		ThreadPool(EventLoop* loop,ThreadFunctor initialCallback=0,const unsigned int threadNum=1);
 		~ThreadPool();
 		void start();
 		EventLoop* getNext();
 	private:
 		const unsigned int threadNum_;
 		unsigned int nextNum_;
+		EventLoop* loop_;
 		ThreadFunctor startFun_;
 		std::vector<std::shared_ptr<Thread>> threads_;
 		std::vector <EventLoop*> loops_;

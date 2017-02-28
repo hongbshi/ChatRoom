@@ -19,11 +19,7 @@ void ChatRoom::TcpServer::newConnection(int sockfd, sockaddr * clientAddr)
 	conn->setCloseCallback(std::bind(&TcpServer::removeConnection,this));
 	//¼ÇÂ¼
 	conn_[name] = conn;
-	EventLoop* loop;
-	if (threadNum_)
-		loop = threadPool_->getNext();
-	else
-		loop = loop_;
+	EventLoop* loop= threadPool_->getNext();
 	loop->runInLoop(std::bind(&TcpConnection::connectEstablished,this));
 }
 
@@ -55,7 +51,7 @@ void ChatRoom::TcpServer::setThreadNum(const unsigned int num)
 	threadNum_ = num;
 }
 
-void ChatRoom::TcpServer::setThreadInitialCallback(Functor initial)
+void ChatRoom::TcpServer::setThreadInitialCallback(Functor& initial)
 {
 	threadInitialCallback_ = initial;
 }
@@ -82,6 +78,7 @@ void ChatRoom::TcpServer::setCloseCallback(CloseCallback &&cb)
 
 void ChatRoom::TcpServer::start()
 {
-	acceptor_->listen();
+	threadPool_ = std::make_shared<ThreadPool>(loop_,threadInitialCallback_, threadNum_);
 	threadPool_->start();
+	acceptor_->listen();
 }

@@ -4,7 +4,9 @@
 #include<stdlib.h>
 using namespace ChatRoom;
 
-int ChatRoom::createNonblockSocket(int family, int type, int protocol)
+int ChatRoom::createNonblockSocket(int family,
+	int type, 
+	int protocol)
 {
 	int fd=socket(family, type, protocol);
 	if (fd < 0)
@@ -14,12 +16,16 @@ int ChatRoom::createNonblockSocket(int family, int type, int protocol)
 	return fd;
 }
 
-int ChatRoom::bindAddress(int sockfd, const sockaddr * addr, socklen_t length)
+int ChatRoom::bindAddress(int sockfd, 
+	const sockaddr * addr, 
+	socklen_t length)
 {
 	return bind(sockfd, addr, length);
 }
 
-int ChatRoom::connectAddress(int sockfd, const sockaddr * addr, socklen_t length)
+int ChatRoom::connectAddress(int sockfd, 
+	const sockaddr * addr, 
+	socklen_t length)
 {
 	return connect(sockfd, addr, length);
 }
@@ -29,7 +35,9 @@ int ChatRoom::listenSocket(int sockfd, int maxNum)
 	return listen(sockfd, addr, length);
 }
 
-int ChatRoom::acceptConnect(int sockfd, sockaddr * clientAddr, socklen_t length)
+int ChatRoom::acceptConnect(int sockfd, 
+	sockaddr * clientAddr, 
+	socklen_t length)
 {
 	return accept(sockfd, addr, length);
 }
@@ -44,22 +52,22 @@ int ChatRoom::shutdownSocket(int sockfd, int type)
 	return shutdown(sockfd, type);
 }
 
-ssize_t ChatRoom::readSocket(int sockfd, void * buff, size_t length)
+ssize_t ChatRoom::readFromSocket(int sockfd, void * buff, size_t length)
 {
 	return read(sockfd,buff,length);
 }
 
-ssize_t ChatRoom::readvSocket(int sockfd, iovec * iov, int iovcnt)
+ssize_t ChatRoom::readvFromSocket(int sockfd, iovec * iov, int iovcnt)
 {
 	return readv(sockfd, iov, iovcnt);
 }
 
-ssize_t ChatRoom::writeSocket(int sockfd, const void * buff, size_t length)
+ssize_t ChatRoom::writeToSocket(int sockfd, const void * buff, size_t length)
 {
 	return write(sockfd, buff, length);
 }
 
-ssize_t ChatRoom::writevSocket(int sockfd, const iovec * iov, int iovcnt)
+ssize_t ChatRoom::writevToSocket(int sockfd, const iovec * iov, int iovcnt)
 {
 	return writev(sockfd, iov, iovcnt);
 }

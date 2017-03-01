@@ -3,9 +3,13 @@
 #include "EventLoop.h"
 
 ChatRoom::ThreadPool::ThreadPool(EventLoop* loop,
-	ThreadFunctor initialCallback, const unsigned int threadNum)
-	:loop_(loop),startFun_(initialCallback),
-	threadNum_(threadNum),loops_(threadNum,nullptr),nextNum_(0)
+	ThreadFunctor initialCallback, 
+	const unsigned int threadNum):
+	loop_(loop),
+	startFun_(initialCallback),
+	threadNum_(threadNum),
+	loops_(threadNum,nullptr),
+	nextNum_(0)
 {
 	for (int i = 0; i < threadNum_; ++i)
 		threads_.push_back(std::make_shared<Thread>(startFun_));

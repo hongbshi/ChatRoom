@@ -1,43 +1,41 @@
 //Not Thread Safe
-
 #ifndef ChatRoom_Buffer_H
 #define ChatRoom_Buffer_H
-
 #include<vector>
 #include<string>
 namespace ChatRoom
 {
 	class Buffer
 	{
+		//Read from Buffer and write/append to buffer
 	public:
 		//Construct
-		Buffer() :readIndex_(0),writeIndex_(0) 
-		{
-			store_ = std::vector<char>(256);
-		}
-		//Original data will be cleared  
-		int Read(std::string& des);
-		//Append to Buffer
-		int Read(Buffer& des);
-		//Clear original data
-		void Read(std::string& des, int& len);
-		//Append to Buffer
-		void Read(Buffer& des, int& len);
-		ssize_t ReadSocket(int sockfd,int* Errno);
-		ssize_t WriteSocket(int sockfd, int* Errno);
-		//Write to Buffer
-		void Append(const std::string& src);
-		void Append(const Buffer& src);
-		void Append(const char* src);
+		Buffer() :readIndex_(0),
+			writeIndex_(0),
+			store_(std::vector<char>(256)) {}
+		//Clear the dst
+		int read(std::string& dst);
+		int read(char* dst,int len);
+		int append(const char* src);
+		int append(const char* src, int len);
+		int append(const std::string& src);
+		//Clear the src
+		int append(Buffer& src);
+		//
+		ssize_t readSocket(int sockfd, int* Errno);
+		ssize_t writeSocket(int sockfd, int* Errno);
+		ssize_t writeFile(const char* path, int* Errno);
 		//other Function
-		int Readable() const;
-		int Writable() const;
 		std::string getString() const;
 		std::string getStringLen(int& len) const;
-		char* getBegin();
-		void clear();
+		int getLine(char* dst, int len) const;
+		int readable() const { return writeIndex_ - readIndex_; }
+		int writable() const { return store_.capacity() - writeIndex_ - 1; }
+		void clear() { readIndex_ = writeIndex_ = 0; }
+		bool isEmpty() { return readable();}
 	private:
 		void adjustStore();
+		char* getBegin() { return &*store_.begin(); }
 		int readIndex_;
 		int writeIndex_;
 		std::vector<char> store_;

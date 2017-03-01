@@ -33,7 +33,8 @@ namespace ChatRoom
 	}
 
 	////////////////////////////////
-	ChatRoom::Thread::Thread(ThreadFunctor initialCallback = 0):mutex_(),cond_(mutex_)
+	ChatRoom::Thread::Thread(ThreadInitial initialCallback):
+		mutex_(),cond_(mutex_)
 	{
 		initialFun_ = initialCallback;
 		tid_ = nullptr;
@@ -48,7 +49,7 @@ namespace ChatRoom
 
 	struct ThreadData
 	{
-		typedef ChatRoom::Thread::ThreadFunctor ThreadFunctor;
+		typedef ChatRoom::Thread::Functor ThreadFunctor;
 		ThreadFunctor fun_;
 		ThreadData(ThreadFunctor fun)
 		{
@@ -88,7 +89,7 @@ namespace ChatRoom
 		}
 		//执行initialcallback
 		if (initialFun_)
-			initialFun_();
+			initialFun_(loop_);
 		//执行事件循环
 		loop.loop();
 	}

@@ -11,8 +11,12 @@ namespace ChatRoom
 	class Acceptor
 	{
 	public:
-		typedef std::function<void(int sockfd,const struct sockaddr& clientAddr)> NewConnectCallback;
-		Acceptor(EventLoop* loop,const struct sockaddr* listenAddr,bool reusePort);
+		typedef std::function<void(int sockfd,
+			const struct sockaddr& clientAddr)> NewConnectCallback;
+
+		Acceptor(EventLoop* loop,
+			const struct sockaddr* listenAddr,
+			bool reusePort);
 		void setNewConnectCallback(NewConnectCallback&& cb);
 		bool isListening();
 		void listen();

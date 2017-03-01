@@ -5,7 +5,9 @@
 #include <sys/socket.h>
 using namespace ChatRoom;
 
-ChatRoom::Acceptor::Acceptor(EventLoop * loop, const sockaddr * listenAddr, bool reusePort):
+ChatRoom::Acceptor::Acceptor(EventLoop * loop, 
+	const sockaddr * listenAddr, 
+	bool reusePort):
 	sockfd_ (createNonblockSocket(AF_INET, SOCK_STREAM, IPPROTO_TCP)),
 	idlefd_ (::open("/dev/null", O_READONLY | O_CLOEXEC)),
 	loop_ (loop),

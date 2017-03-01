@@ -16,14 +16,15 @@ namespace ChatRoom
 	class Thread
 	{
 	public:
-		typedef std::function<void()> ThreadFunctor;
-		Thread(ThreadFunctor initialCallback=0);
+		typedef std::function<void()> Functor;
+		typedef std::function<void(EventLoop*)> ThreadInitial;
+		Thread(ThreadInitial initialCallback=0);
 		~Thread();
 		EventLoop* startloop();
 	private:
 		//子线程执行
 		void run();
-		ThreadFunctor initialFun_;
+		ThreadInitial initialFun_;
 		pid_t tid_;
 		pthread_t pthreadId_;
 		EventLoop* loop_;

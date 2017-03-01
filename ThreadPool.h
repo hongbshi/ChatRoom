@@ -10,8 +10,10 @@ namespace ChatRoom
 	class ThreadPool
 	{
 	public:
-		typedef std::function<void()> ThreadFunctor;
-		ThreadPool(EventLoop* loop,ThreadFunctor initialCallback=0,const unsigned int threadNum=1);
+		typedef std::function<void(EventLoop*)> ThreadFunctor;
+		ThreadPool(EventLoop* loop,
+			ThreadFunctor initialCallback=0,
+			const unsigned int threadNum=1);
 		~ThreadPool();
 		void start();
 		EventLoop* getNext();

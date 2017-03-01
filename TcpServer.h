@@ -2,16 +2,18 @@
 #define ChatRoom_TcpServer_H
 #include<memory>
 #include<map>
+#include<functional>
 namespace ChatRoom
 {
 	class EventLoop;
 	class Acceptor;
 	class TcpConnection;
 	class ThreadPool;
+	class Buffer;
 	class TcpServer
 	{
 	public:
-		typedef std::function<void()> Functor;
+		typedef std::function<void(EventLoop*)> Functor;
 		typedef std::shared_ptr<TcpConnection> TcpConnectionPtr;
 		typedef std::function<void(TcpConnectionPtr ptr, Buffer* buff)> MessageCallback;
 		typedef std::function<void(TcpConnectionPtr ptr)> NewConnectionCallback;
@@ -21,7 +23,7 @@ namespace ChatRoom
 		TcpServer(EventLoop* loop, const struct sockaddr* listenAddr, bool reusePort=false);
 	
 		void setThreadNum(const unsigned int num);
-		void setThreadInitialCallback(Functor& initial);
+		void setThreadInitialCallback(Functor&& initial);
 
 		void setNewConnectionCallback(NewConnectionCallback && cb);
 		void setMessageCallback(MessageCallback &&cb);

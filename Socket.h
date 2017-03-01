@@ -14,10 +14,10 @@ namespace ChatRoom
 	int acceptConnect(int sockfd, sockaddr* clientAddr, socklen_t length);
 	int closeSocket(int sockfd);
 	int shutdownSocket(int sockfd, int type);
-	ssize_t readSocket(int sockfd, void* buff, size_t length);
-	ssize_t readvSocket(int sockfd, struct iovec *iov, int iovcnt);
-	ssize_t writeSocket(int sockfd, const void* buff, size_t length);
-	ssize_t writevSocket(int sockfd, const struct iovec *iov, int iovcnt);
+	ssize_t readFromSocket(int sockfd, void* buff, size_t length);
+	ssize_t readvFromSocket(int sockfd, struct iovec *iov, int iovcnt);
+	ssize_t writeToSocket(int sockfd, const void* buff, size_t length);
+	ssize_t writevToSocket(int sockfd, const struct iovec *iov, int iovcnt);
 	//socket ops
 	struct sockaddr* sockaddr_cast(struct sockaddr_in* addr);
 	struct sockaddr_in* sockaddr_in_cast(struct sockaddr* addr);

@@ -6,11 +6,18 @@
 #include <unistd.h>
 using namespace ChatRoom;
 int ChatRoom::TcpConnection::number = 1;
-ChatRoom::TcpConnection::TcpConnection(EventLoop * loop, int sockfd, 
+ChatRoom::TcpConnection::TcpConnection(EventLoop * loop, 
+	int sockfd, 
 	sockaddr_in localAddress, 
-	sockaddr_in peerAddress,const std::string& name):loop_(loop),sockfd_(sockfd),
-	localAddress_(localAddress), peerAddress_(peerAddress),name_(name),
-	sockState_(kConnecting), channel_(std::make_shared<Channel>(sockfd_))
+	sockaddr_in peerAddress,
+	const std::string& name):
+	loop_(loop),
+	sockfd_(sockfd),
+	localAddress_(localAddress), 
+	peerAddress_(peerAddress),
+	name_(name),
+	sockState_(kConnecting), 
+	channel_(std::make_shared<Channel>(sockfd_))
 {
 	connectedCallback_=NULL;
 	closeCallback_ = NULL;

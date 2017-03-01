@@ -51,7 +51,7 @@ void ChatRoom::TcpServer::setThreadNum(const unsigned int num)
 	threadNum_ = num;
 }
 
-void ChatRoom::TcpServer::setThreadInitialCallback(Functor& initial)
+void ChatRoom::TcpServer::setThreadInitialCallback(Functor&& initial)
 {
 	threadInitialCallback_ = initial;
 }

@@ -39,6 +39,23 @@ int Buffer::append(Buffer& src)
 	return result;
 }
 
+const char * ChatRoom::Buffer::readCRLF()
+{
+	char* start = getBegin();
+	char* end = getEnd();
+	while (start < end)
+	{
+		if (*start == '\r'&& start + 1 < end && *(start + 1) == '\n')
+			break;
+		else
+			++start;
+	}
+	if (start + 1 < end && *start == '\r')
+		return start;
+	else
+		return nullptr;
+}
+
 int Buffer::append(const char* src)
 {
 	if (src == nullptr)

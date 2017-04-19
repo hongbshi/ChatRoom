@@ -22,13 +22,19 @@ namespace ChatRoom
 		//Clear the src
 		int append(Buffer& src);
 		//
+		const char* readCRLF();
+		void retrival(const char* str) {
+			char* start = getBegin();
+			readIndex_ += (str - start);
+			adjustStore();
+		}
+		//
 		ssize_t readSocket(int sockfd, int* Errno);
 		ssize_t writeSocket(int sockfd, int* Errno);
 		ssize_t writeFile(const char* path, int* Errno);
 		//other Function
 		std::string getString() const;
 		std::string getStringLen(int& len) const;
-		int getLine(char* dst, int len) const;
 		int readable() const { return writeIndex_ - readIndex_; }
 		int writable() const { return store_.capacity() - writeIndex_ - 1; }
 		void clear() { readIndex_ = writeIndex_ = 0; }
@@ -36,6 +42,7 @@ namespace ChatRoom
 	private:
 		void adjustStore();
 		char* getBegin() { return &*store_.begin(); }
+		char* getEnd() { return &*store_.end(); }
 		int readIndex_;
 		int writeIndex_;
 		std::vector<char> store_;

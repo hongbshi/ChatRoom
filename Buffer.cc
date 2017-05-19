@@ -1,6 +1,6 @@
 #include "Buffer.h"
 #include "Socket.h"
-#include<cstring>
+#include <cstring>
 #include <sys/types.h>    
 #include <sys/stat.h>   
 #include <fcntl.h>
@@ -9,6 +9,7 @@ int Buffer::read(std::string& dst)
 {
 	dst.clear();
 	int len = readable();
+	dst.reserve(len+1);
 	dst.append(&store_[readIndex_], &store_[writeIndex_]);
 	clear();
 	return len;

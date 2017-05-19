@@ -1,8 +1,8 @@
 //Not Thread Safe
 #ifndef ChatRoom_Buffer_H
 #define ChatRoom_Buffer_H
-#include<vector>
-#include<string>
+#include <vector>
+#include <string>
 namespace ChatRoom
 {
 	class Buffer
@@ -17,10 +17,8 @@ namespace ChatRoom
 		int read(std::string& dst);
 		int read(char* dst,int len);
 		int append(const char* src);
-		int append(const char* src, int len);
 		int append(const std::string& src);
-		//Clear the src
-		int append(Buffer& src);
+		int append(Buffer& src); //src will be cleared
 		//
 		const char* readCRLF();
 		void retrival(const char* str) {
@@ -41,8 +39,13 @@ namespace ChatRoom
 		bool isEmpty() { return readable();}
 	private:
 		void adjustStore();
-		char* getBegin() { return &*store_.begin(); }
-		char* getEnd() { return &*store_.end(); }
+		int append(const char* src, int len);
+		char* getBegin() const { 
+			return &store_[readIndex_]; 
+		}
+		char* getEnd() const { 
+			return &store_[writeIndex_];
+		}
 		int readIndex_;
 		int writeIndex_;
 		std::vector<char> store_;

@@ -18,7 +18,7 @@ namespace ChatRoom
 		HttpServer(EventLoop* loop, 
 			const struct sockaddr* listenAddr,
 			bool reusePort = false);
-		void setThreadNumber(unsigned int num);
+		void setThreadNumber(const unsigned int num);
 		void setNewConnectionCallback(NewConnectionCallback& cb) { newConnCb_ = cb; }
 		void setMessageCallback(MessageCallback& cb) { messageCb_ = cb; }
 		void setCloseCallback(CloseCallback& cb) { closeCb_ = cb; }

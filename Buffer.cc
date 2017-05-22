@@ -1,26 +1,24 @@
 #include "Buffer.h"
 #include "Socket.h"
 #include <cstring>
+#include <algorithm>
 #include <sys/types.h>    
 #include <sys/stat.h>   
 #include <fcntl.h>
 using namespace ChatRoom;
-int Buffer::read(std::string& dst)
+int Buffer::readFromBuffer(std::string& str)
 {
-	dst.clear();
-	int len = readable();
-	dst.reserve(len+1);
-	dst.append(&store_[readIndex_], &store_[writeIndex_]);
-	clear();
+	str.assign(&store_[readIndex_], &store_[writeIndex_]);
+	int len = writeIndex_ - readIndex_;
+	readIndex_ = writeIndex_ = 0;
 	return len;
 }
 
-int ChatRoom::Buffer::read(char * dst,int len)
+int ChatRoom::Buffer::readFromBuffer(char *dst,int len)
 {
-	if (len < 1)
-		return -1;
+	if (len < 1) return 0;
 	int result = readable();
-	int real = (len-1 <= result) ? len - 1 : result;
+	int real = (len - 1 <= result) ? len - 1 : result;
 	strncpy(dst, &store_[readIndex_], real);
 	dst[real] = '\0';
 	readIndex_ += real;
@@ -28,49 +26,51 @@ int ChatRoom::Buffer::read(char * dst,int len)
 	return real;
 }
 
-int Buffer::append(const std::string& src)
+int Buffer::writeToBuffer(const std::string& src)
 {
-	return append(&*src.begin(), src.size());
+	const char *ptr = (src.empty() ? nullptr : &src[0]);
+	return writeToBuffer(ptr, src.size());
 }
 
-int Buffer::append(Buffer& src)
+int Buffer::writeToBuffer(Buffer& src)
 {
-	int result = append(src.getBegin(), src.readable());
+	int result = writeToBuffer(src.getBegin(), src.readable());
 	src.clear();
 	return result;
 }
 
 const char * ChatRoom::Buffer::readCRLF()
 {
-	char* start = getBegin();
-	char* end = getEnd();
-	while (start < end)
-	{
-		if (*start == '\r'&& start + 1 < end && *(start + 1) == '\n')
-			break;
-		else
-			++start;
+	const char* start = getBegin();
+	const char* end = getEnd();
+	while (start < end){
+		if (*start == '\r'&& start + 1 < end && *(start + 1) == '\n') break;
+		else ++start;
 	}
-	if (start + 1 < end && *start == '\r')
-		return start;
-	else
-		return nullptr;
+	if (start + 1 < end && *start == '\r') return start;
+	else return nullptr;
 }
 
-int Buffer::append(const char* src)
-{
-	if (src == nullptr)
-		return -1;
-	else
-		return append(src, strlen(src));
+std::string ChatRoom::Buffer::readUntilCRLF(const char* ptr)
+{	
+	std::string result;
+	if (ptr == nullptr) return result;
+	result.assign(getBegin(), ptr + 2);
+	retrival(ptr + 2);
+	adjustStore();
+	return result;
 }
 
-int ChatRoom::Buffer::append(const char * src, int len)
+int Buffer::writeToBuffer(const char* src)
 {
-	if (src == nullptr)
-		return -1;
-	if (writable() < len)
-		store_.resize(2 * store_.capacity());
+	if (src == nullptr) return 0;
+	else return writeToBuffer(src, strlen(src));
+}
+
+int ChatRoom::Buffer::writeToBuffer(const char * src, int len)
+{
+	if (src == nullptr) return 0;
+	if (writable() < len) store_.resize(2 * store_.capacity());
 	memcpy(&store_[writeIndex_], src, len);
 	writeIndex_ += len;
 	return len;
@@ -98,7 +98,7 @@ ssize_t ChatRoom::Buffer::readSocket(int sockfd,int* Errno)
 		else
 		{
 			writeIndex_ += len1;
-			append(start2,result-len1);
+			writeToBuffer(start2,result-len1);
 		}
 	}
 	else if (result < 0)
@@ -111,14 +111,12 @@ ssize_t ChatRoom::Buffer::writeSocket(int sockfd, int * Errno)
 	ssize_t result=writeToSocket(sockfd, 
 		&store_[readIndex_], 
 		readable());
-	if (result < 0)
-		*Errno = errno;
-	else if (0 < result)
-		readIndex_ += result;
+	if (result < 0) *Errno = errno;
+	else if (0 < result) readIndex_ += result;
 	return result;
 }
 
-ssize_t ChatRoom::Buffer::writeFile(const char * path, int * Errno)
+ssize_t ChatRoom::Buffer::readFromFile(const char * path, int * Errno)
 {
 	////File not exit
 	struct stat st;
@@ -155,8 +153,7 @@ ssize_t ChatRoom::Buffer::writeFile(const char * path, int * Errno)
 			*Errno = errno;
 			break;
 		}
-		if (tmp == 0)
-			break;
+		if (tmp == 0) break;
 		//Deal result
 		if (tmp <= len1)
 		{
@@ -167,7 +164,7 @@ ssize_t ChatRoom::Buffer::writeFile(const char * path, int * Errno)
 		else
 		{
 			writeIndex_ += len1;
-			append(start2,tmp-len1);
+			writeToBuffer(start2,tmp-len1);
 			result += tmp;
 		}	
 	}

@@ -17,12 +17,13 @@ ChatRoom::TcpConnection::TcpConnection(EventLoop * loop,
 	peerAddress_(peerAddress),
 	name_(name),
 	sockState_(kConnecting), 
-	channel_(std::make_shared<Channel>(sockfd_))
+	channel_(std::make_shared<Channel>(sockfd_)),
+	context_()
 {
-	connectedCallback_=NULL;
-	closeCallback_ = NULL;
-	writeCallback_ = NULL;
-	messageCallback_ = NULL;
+	connectedCallback_= nullptr;
+	closeCallback_ = nullptr;
+	writeCallback_ = nullptr;
+	messageCallback_ = nullptr;
 	channel_->setCloseCallback(std::bind(&TcpConnection::handleClose, shared_from_this()));
 	channel_->setReadCallback(std::bind(&TcpConnection::handleRead, shared_from_this()));
 	channel_->setErrorCallback(std::bind(&TcpConnection::handleError, shared_from_this()));

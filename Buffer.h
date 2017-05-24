@@ -40,15 +40,16 @@ namespace ChatRoom
 		int writable() const { return store_.capacity() - writeIndex_ - 1; }
 		void clear() { readIndex_ = writeIndex_ = 0; }
 		bool isEmpty() { return readIndex_ == writeIndex_;}
+
+		const char* getBegin() const {
+			return static_cast<const char*>(&store_[readIndex_]);
+		}
+		const char* getEnd() const {
+			return static_cast<const char*>(&store_[writeIndex_]);
+		}
 	private:
 		void adjustStore();
 		int writeToBuffer(const char* src, int len);
-		const char* getBegin() const{ 
-			return static_cast<const char*>(&store_[readIndex_]); 
-		}
-		const char* getEnd() const{ 
-			return static_cast<const char*>(&store_[writeIndex_]);
-		}
 		int readIndex_;
 		int writeIndex_;
 		std::vector<char> store_;

@@ -1,11 +1,13 @@
 #ifndef  ChatRoom_HttpServer_H
-#define ChatRoom_HttpServer_H
+#define  ChatRoom_HttpServer_H
 
-#include<functional>
+#include <functional>
 #include "TcpServer.h"
 namespace ChatRoom
 {
 	class EventLoop;
+	class HttpRequest;
+	class HttpResponse;
 	class HttpServer
 	{
 	public:
@@ -13,7 +15,7 @@ namespace ChatRoom
 		typedef std::shared_ptr<TcpConnection> TcpConnectionPtr;
 		typedef std::function<void(EventLoop*)> ThreadInitial;
 		typedef std::function<void(TcpConnectionPtr)> NewConnectionCallback;
-		typedef std::function<void(TcpConnectionPtr,Buffer*)> MessageCallback;
+		typedef std::function<void(const HttpRequest&, HttpResponse&)> MessageCallback;
 		typedef std::function<void(TcpConnectionPtr)> CloseCallback;
 		HttpServer(EventLoop* loop, 
 			const struct sockaddr* listenAddr,
@@ -26,6 +28,8 @@ namespace ChatRoom
 	private:
 		void newCb(TcpConnectionPtr ptr);
 		void messageCb(TcpConnectionPtr ptr, Buffer* buff);
+		void messageCbHelp(TcpConnectionPtr ptr, const HttpRequest& request);
+		void defaultMessageCb(const HttpRequest& request, HttpResponse& response);
 		void closeCb(TcpConnectionPtr ptr);
 		void threadInitial(EventLoop*);
 		EventLoop* loop_;

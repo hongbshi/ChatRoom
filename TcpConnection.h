@@ -16,6 +16,7 @@ namespace ChatRoom
 		{
 			kConnecting, kConnected, kDisconnecting, kDisconnected
 		};
+
 	public:
 		typedef std::shared_ptr<TcpConnection> TcpConnectionPtr;
 		typedef std::function<void(TcpConnectionPtr)> ConnectedCallback;
@@ -78,6 +79,15 @@ namespace ChatRoom
 
 		bool connected() { return sockState_ == kConnected; }
 		bool disConnected() { return sockState_ == kDisconnected; }
+
+		void setContext(std::shared_ptr<void> ptr) {
+			context_ = ptr;
+		}
+
+		std::shared_ptr<void> getContext() {
+			return context_;
+		}
+
 	private:
 		void handleRead();
 		void handleWrite();
@@ -105,6 +115,8 @@ namespace ChatRoom
 		Buffer outputBuffer_;
 
 		static int number;
+
+		std::shared_ptr<void> context_;
 	};
 }
 #endif // ! ChatRoom_TcpConnection_H

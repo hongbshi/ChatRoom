@@ -1,14 +1,15 @@
 #ifndef  ChatRoom_HttpResponse_H
-#define ChatRoom_HttpResponse_H
+#define  ChatRoom_HttpResponse_H
 #include <string>
 #include <unordered_map>
 namespace ChatRoom
 {
-	using std::string;
 	class Buffer;
+	using std::string;
+	typedef ChatRoom::HttpRequest::HttpVersion;
 	class HttpResponse {
 	public:
-		enum Status {
+		enum HttpResponseStatus {
 			kUnKnown,
 			k200Succeed = 200,
 			k400Failed = 400,
@@ -16,7 +17,7 @@ namespace ChatRoom
 		};
 		HttpResponse() :statusCode_(kUnKnown) {}
 		void setHttpVersion(string && ver) { httpVersion_ = ver; }
-		void setStatus(Status && code) {
+		void setStatus(HttpResponseStatus && code) {
 			statusCode_ = code; 
 			switch (code){
 			case k200Succeed:
@@ -36,10 +37,10 @@ namespace ChatRoom
 		void setHeader(std::unordered_map<string, string> && head) { header_ = head; }
 		void setBody(string && body) { body_ = body; }
 		void setFilePath(string && path) { filePath_ = path; }
-		void appendToBuffer(Buffer* buff);
+		void appendToBuffer(Buffer& buff);
 	private:
-		string httpVersion_;
-		Status statusCode_;
+		HttpVersion httpVersion_;
+		HttpResponseStatus statusCode_;
 		string statusMessage_;
 		std::unordered_map<string, string> header_;
 		string filePath_;

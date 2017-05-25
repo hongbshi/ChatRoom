@@ -1,7 +1,7 @@
 #ifndef  ChatRoom_MutexLock_H
-#define ChatRoom_MutexLock_H
+#define  ChatRoom_MutexLock_H
 
-#include<pthread.h>
+#include <pthread.h>
 namespace ChatRoom
 {
 	class MutexLock

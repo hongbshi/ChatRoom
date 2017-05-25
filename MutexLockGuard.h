@@ -1,5 +1,5 @@
 #ifndef  ChatRoom_MutexLockGuard_H
-#define ChatRoom_MutexLockGuard_H
+#define  ChatRoom_MutexLockGuard_H
 
 namespace ChatRoom
 {

@@ -1,7 +1,10 @@
 #include "Socket.h"
 
-#include<fcntl.h>
-#include<stdlib.h>
+#include <fcntl.h>
+#include <unistd.h>
+#include <errno.h>
+#include <sys/types.h>
+#include <sys/socket.h>
 using namespace ChatRoom;
 
 int ChatRoom::createNonblockSocket(int family,
@@ -9,10 +12,8 @@ int ChatRoom::createNonblockSocket(int family,
 	int protocol)
 {
 	int fd=socket(family, type, protocol);
-	if (fd < 0)
-		return -1;
-	if (setNonblock(fd) < 0)
-		return -1;
+	if (fd < 0) return -1;
+	if (setNonblock(fd) < 0) return -1;
 	return fd;
 }
 
@@ -32,19 +33,19 @@ int ChatRoom::connectAddress(int sockfd,
 
 int ChatRoom::listenSocket(int sockfd, int maxNum)
 {
-	return listen(sockfd, addr, length);
+	return listen(sockfd, maxNum);
 }
 
 int ChatRoom::acceptConnect(int sockfd, 
 	sockaddr * clientAddr, 
 	socklen_t length)
 {
-	return accept(sockfd, addr, length);
+	return accept(sockfd, clientAddr, &length);
 }
 
 int ChatRoom::closeSocket(int sockfd)
 {
-	return close(sockfd, addr, length);
+	return close(sockfd);
 }
 
 int ChatRoom::shutdownSocket(int sockfd, int type)
@@ -141,11 +142,9 @@ int ChatRoom::setNonblock(int sockfd)
 {
 	int flag;
 	flag = fcntl(sockfd, F_GETFL, 0);
-	if (flag < 0)
-		return -1;
-	flags |= O_NONBLOCK;
-	if (::fcntl(sockfd, F_SETFL, flags) < 0)
-		return -1;
+	if (flag < 0) return -1;
+	flag |= O_NONBLOCK;
+	if (::fcntl(sockfd, F_SETFL, flag) < 0) return -1;
 	return 1;
 }
 

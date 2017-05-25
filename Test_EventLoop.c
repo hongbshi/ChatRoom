@@ -1,8 +1,8 @@
-#include<iostream>
-#include<stdio.h>
-#include<functional>
-#include<pthread.h>
-#include<unistd.h>
+#include <iostream>
+#include <stdio.h>
+#include <functional>
+#include <pthread.h>
+#include <unistd.h>
 #include "EventLoop.h"
 #include "MutexLock.h"
 #include "MutexLockGuard.h"
@@ -49,5 +49,4 @@ int main()
 	childLoop->quit();
         pthread_join(child,NULL);
 	std::cout<<"The main Thread quit"<<std::endl;
-
 }

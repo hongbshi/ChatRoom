@@ -1,7 +1,7 @@
 #ifndef  ChatRoom_Condition_H
-#define ChatRoom_Condition_H
+#define  ChatRoom_Condition_H
 
-#include<pthread>
+#include <pthread.h>
 #include "MutexLock.h"
 namespace ChatRoom
 {

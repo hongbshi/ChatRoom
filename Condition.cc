@@ -7,7 +7,7 @@ ChatRoom::Condition::Condition(MutexLock & lock):lock_(lock)
 
 ChatRoom::Condition::~Condition()
 {
-	pthread_cond_destroy(&cond);
+	pthread_cond_destroy(&cond_);
 }
 
 void ChatRoom::Condition::wait()
@@ -17,7 +17,7 @@ void ChatRoom::Condition::wait()
 
 void ChatRoom::Condition::notify()
 {
-	pthread_cond_signal()
+	pthread_cond_signal(&cond_);
 }
 
 void ChatRoom::Condition::notifyAll()

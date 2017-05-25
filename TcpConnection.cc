@@ -1,8 +1,8 @@
 #include "TcpConnection.h"
 #include "Socket.h"
-#include<memory>
-#include<stdlib.h>
-#include<assert.h>
+#include <memory>
+#include <stdlib.h>
+#include <assert.h>
 #include <unistd.h>
 using namespace ChatRoom;
 int ChatRoom::TcpConnection::number = 1;

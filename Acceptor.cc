@@ -2,14 +2,15 @@
 #include "Socket.h"
 #include "Channel.h"
 #include "EventLoop.h"
-#include <sys/socket.h>
+#include <stdio.h>
+#include <fcntl.h> 
 using namespace ChatRoom;
 
 ChatRoom::Acceptor::Acceptor(EventLoop * loop, 
 	const sockaddr * listenAddr, 
 	bool reusePort):
 	sockfd_ (createNonblockSocket(AF_INET, SOCK_STREAM, IPPROTO_TCP)),
-	idlefd_ (::open("/dev/null", O_READONLY | O_CLOEXEC)),
+	idlefd_ (open("/dev/null", O_RDONLY | O_CLOEXEC)),
 	loop_ (loop),
 	channel_ (sockfd_),
 	newConnectCallback_ (nullptr),
@@ -17,8 +18,7 @@ ChatRoom::Acceptor::Acceptor(EventLoop * loop,
 {
 	bindAddress(sockfd_, listenAddr, sizeof listenAddr);
 	setReuseAddr(sockfd_);
-	if (reusePort)
-		setReusePort(sockfd_);
+	if (reusePort) setReusePort(sockfd_);
 	channel_.setReadCallback(std::bind(&Acceptor::handleRead, this));
 }
 
@@ -45,7 +45,7 @@ ChatRoom::Acceptor::~Acceptor()
 	channel_.disableAll();
 	loop_->removeChannle(&channel_);
 	closeSocket(sockfd_);
-	::close(idlefd_);
+	close(idlefd_);
 }
 
 void ChatRoom::Acceptor::handleRead()
@@ -63,10 +63,10 @@ void ChatRoom::Acceptor::handleRead()
 	{
 		if (errno == EMFILE)
 		{
-			::close(idlefd_);
+			close(idlefd_);
 			idlefd_ = acceptConnect(connectFd, &clientAddr, sizeof clientAddr);
 			closeSocket(idlefd_);
-			::fopen("/dev/null", O_READONLY | O_CLOEXEC);
+			fopen("/dev/null", "r");
 		}
 	}	
 }

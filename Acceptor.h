@@ -1,8 +1,10 @@
 #ifndef  ChatRoom_Acceptor_H
-#define ChatRoom_Acceptor_H
+#define  ChatRoom_Acceptor_H
 
-#include<memory>
-#include<functional>
+#include <memory>
+#include <functional>
+#include <sys/types.h>
+#include <sys/socket.h>
 #include "Channel.h"
 namespace ChatRoom
 {
@@ -11,9 +13,7 @@ namespace ChatRoom
 	class Acceptor
 	{
 	public:
-		typedef std::function<void(int sockfd,
-			const struct sockaddr& clientAddr)> NewConnectCallback;
-
+		typedef std::function<void(int sockfd, const struct sockaddr& clientAddr)> NewConnectCallback;
 		Acceptor(EventLoop* loop,
 			const struct sockaddr* listenAddr,
 			bool reusePort);

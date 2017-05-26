@@ -4,8 +4,6 @@
 #include <cstddef>
 #include <sys/syscall.h>
 #include <unistd.h>
-#include <pthread.h>
-#include <string>
 #include <functional>
 #include "MutexLock.h"
 #include "Condition.h"

@@ -24,7 +24,7 @@ namespace ChatRoom
 		//use send to write data
 		typedef std::function<void(TcpConnectionPtr)> WriteCallback;
 		//use getOutputBuffer first
-		typedef std::function<void(TcpConnectionPtr)> MessageCallback;
+		typedef std::function<void(TcpConnectionPtr, Buffer*)> MessageCallback;
 
 		TcpConnection(EventLoop* loop,int sockfd,
 		struct sockaddr_in localAddress,
@@ -58,9 +58,9 @@ namespace ChatRoom
 		void connectEstablished();
 		void connectDestroyed();
 
-		void send(std::string& s);
+		void send(std::string&& s);
 		//void send(std::string&& s);
-		void send(Buffer& buff);
+		void send(Buffer&& buff);
 		//void send(Buffer&& buff);
 
 		void close();

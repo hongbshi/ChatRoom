@@ -1,6 +1,9 @@
 #include "TcpConnection.h"
 #include "Socket.h"
+
 #include <memory>
+#include <fcntl.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
 #include <unistd.h>
@@ -31,7 +34,7 @@ ChatRoom::TcpConnection::TcpConnection(EventLoop * loop,
 }
 ChatRoom::TcpConnection::~TcpConnection()
 {
-	::close(sockfd_);
+	closeSocket(sockfd_);
 }
 // Must in TcpConnection loop
 void ChatRoom::TcpConnection::connectEstablished()
@@ -40,8 +43,7 @@ void ChatRoom::TcpConnection::connectEstablished()
 	setStates(kConnected);
 	channel_->enableRead();
 	loop_->updateChannle(&*channel_);
-	if (connectedCallback_)
-		connectedCallback_(shared_from_this());
+	if (connectedCallback_) connectedCallback_(shared_from_this());
 }
 // Must in TcpConnection loop
 void ChatRoom::TcpConnection::connectDestroyed()
@@ -77,16 +79,16 @@ void ChatRoom::TcpConnection::shutdownWrite()
 //{
 //}
 
-void ChatRoom::TcpConnection::send(std::string & s)
+void ChatRoom::TcpConnection::send(std::string && s)
 {
-	loop_->runInLoop(std::bind(&TcpConnection::sendInLoop, shared_from_this()));
+	loop_->runInLoop(std::bind(&TcpConnection::sendInLoop, shared_from_this(),s));
 }
 
 //void ChatRoom::TcpConnection::send(std::string && s)
 //{
 //}
 
-void ChatRoom::TcpConnection::send(Buffer & buff)
+void ChatRoom::TcpConnection::send(Buffer && buff)
 {
 	send(buff.getString());
 }
@@ -100,10 +102,10 @@ void ChatRoom::TcpConnection::handleRead()
 	//Initial variable
 	int Errno;
 	//Get read result
-	int result=outputBuffer_.ReadSocket(sockfd_, &Errno);
+	int result = outputBuffer_.readSocket(sockfd_, &Errno);
 	//Deal result
 	if (result > 0 && messageCallback_)
-		messageCallback_(shared_from_this());
+		messageCallback_(shared_from_this(),&outputBuffer_);
 	else if (result == 0)
 		handleClose();	
 	else
@@ -116,10 +118,10 @@ void ChatRoom::TcpConnection::handleRead()
 void ChatRoom::TcpConnection::handleWrite()
 {
 	int Errno;
-	int result=inputBuffer_.WriteSocket(sockfd_, &Errno);
+	int result = inputBuffer_.writeSocket(sockfd_, &Errno);
 	if (0 < result)
 	{
-		if (inputBuffer_.Readable() == 0)
+		if (inputBuffer_.readable() == 0)
 		{
 			channel_->disableWrite();
 			loop_->updateChannle(&*channel_);
@@ -139,7 +141,7 @@ void ChatRoom::TcpConnection::handleWrite()
 void ChatRoom::TcpConnection::handleError()
 {
 	//log something
-	::exit(-1);
+	exit(-1);
 }
 
 void ChatRoom::TcpConnection::handleClose()
@@ -159,14 +161,14 @@ void ChatRoom::TcpConnection::sendInLoop(std::string & s)
 {
 	if (sockState_ == kDisconnecting || sockState_ == kDisconnected)
 		return;
-	inputBuffer_.Append(s);  //try send one time
+	inputBuffer_.writeToBuffer(s);  //try send one time
 	channel_->enableWrite();
 	loop_->updateChannle(&*channel_);
 }
 
 void ChatRoom::TcpConnection::shutdownWriteInLoop()
 {
-	shutdownSocket(sockfd_, SHUT_WRONLY);
+	shutdownSocket(sockfd_, SHUT_WR);
 	channel_->disableWrite();
 	loop_->updateChannle(&*channel_);
 	setStates(kDisconnecting);

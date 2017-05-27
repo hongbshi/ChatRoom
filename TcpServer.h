@@ -3,6 +3,8 @@
 #include <memory>
 #include <map>
 #include <functional>
+#include <sys/types.h>
+#include <sys/socket.h>
 namespace ChatRoom
 {
 	class EventLoop;
@@ -13,26 +15,25 @@ namespace ChatRoom
 	class TcpServer
 	{
 	public:
-		typedef std::function<void(EventLoop*)> Functor;
 		typedef std::shared_ptr<TcpConnection> TcpConnectionPtr;
-		typedef std::function<void(TcpConnectionPtr ptr, Buffer* buff)> MessageCallback;
+		typedef std::function<void(EventLoop*)> ThreadInitialCallback;
 		typedef std::function<void(TcpConnectionPtr ptr)> NewConnectionCallback;
 		//typedef std::function<void(TcpConnectionPtr ptr)> WriteCompleteCallback();
+		typedef std::function<void(TcpConnectionPtr ptr, Buffer* buff)> MessageCallback;
 		typedef std::function<void(TcpConnectionPtr ptr)> CloseCallback;
-		typedef std::shared_ptr<TcpConnection> TcpConnectionPtr;
-		TcpServer(EventLoop* loop, const struct sockaddr* listenAddr, bool reusePort=false);
+		TcpServer(EventLoop* loop, const struct sockaddr* listenAddr, bool reusePort = false);
 	
 		void setThreadNum(const unsigned int num);
-		void setThreadInitialCallback(Functor&& initial);
+		void setThreadInitialCallback(ThreadInitialCallback && initial);
 
 		void setNewConnectionCallback(NewConnectionCallback && cb);
-		void setMessageCallback(MessageCallback &&cb);
+		void setMessageCallback(MessageCallback && cb);
 		//void setWriteCompleteCallback(WriteCompleteCallback &&cb);
-		void setCloseCallback(CloseCallback &&cb);
+		void setCloseCallback(CloseCallback && cb);
 		void start();
 	private:
 		//For Acceptor 
-		void newConnection(int sockfd, struct sockaddr* clientAddr);
+		void newConnection(int sockfd, const struct sockaddr& clientAddr);
 		//For TcpConnection
 		void removeConnection(TcpConnectionPtr ptr);
 		void removeConnectionInLoop(TcpConnectionPtr ptr);
@@ -40,7 +41,7 @@ namespace ChatRoom
 		struct sockaddr listenAddr_;
 		bool reusePort_;
 		unsigned int threadNum_;
-		Functor threadInitialCallback_;
+		ThreadInitialCallback threadInitialCallback_;
 		std::shared_ptr<Acceptor> acceptor_;
 		std::shared_ptr<ThreadPool> threadPool_;
 		std::map<std::string, TcpConnectionPtr> conn_;

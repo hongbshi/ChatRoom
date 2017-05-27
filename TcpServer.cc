@@ -4,9 +4,10 @@
 #include "ThreadPool.h"
 #include <stdio.h>
 
-void ChatRoom::TcpServer::newConnection(int sockfd, sockaddr * clientAddr)
+using namespace ChatRoom;
+void ChatRoom::TcpServer::newConnection(int sockfd, const sockaddr & clientAddr)
 {
-	char buff[30];
+	char buff[32];
 	int number = ChatRoom::TcpConnection::getNumber();
 	snprintf(buff,sizeof buff, "%s,%d","TcpConnection", number);
 	std::string name(buff);
@@ -17,20 +18,18 @@ void ChatRoom::TcpServer::newConnection(int sockfd, sockaddr * clientAddr)
 	conn->setMessageCallback(messageCallback_);
 	//conn->setWriteCallback(writeCompleteCallback_);
 	conn->setCloseCallback(std::bind(&TcpServer::removeConnection,this));
-	//¼ÇÂ¼
 	conn_[name] = conn;
 	EventLoop* loop= threadPool_->getNext();
-	loop->runInLoop(std::bind(&TcpConnection::connectEstablished,this));
+	loop->runInLoop(std::bind(&TcpConnection::connectEstablished,conn));
 }
 
 void ChatRoom::TcpServer::removeConnection(TcpConnectionPtr ptr)
 {
-	loop_->runInLoop(std::bind(&TcpServer::removeConnectionInLoop, this));
+	loop_->runInLoop(std::bind(&TcpServer::removeConnectionInLoop, this, ptr));
 }
 
 void ChatRoom::TcpServer::removeConnectionInLoop(TcpConnectionPtr ptr)
 {
-	//É¾³ý¼ÇÂ¼
 	conn_.erase(ptr->getName());
 	EventLoop* ioloop = ptr->getLoop();
 	ioloop->runInLoop(std::bind(&TcpConnection::connectDestroyed, ptr));
@@ -51,7 +50,7 @@ void ChatRoom::TcpServer::setThreadNum(const unsigned int num)
 	threadNum_ = num;
 }
 
-void ChatRoom::TcpServer::setThreadInitialCallback(Functor&& initial)
+void ChatRoom::TcpServer::setThreadInitialCallback(ThreadInitialCallback&& initial)
 {
 	threadInitialCallback_ = initial;
 }
@@ -61,7 +60,7 @@ void ChatRoom::TcpServer::setNewConnectionCallback(NewConnectionCallback && cb)
 	newConnectionCallback_ = cb;
 }
 
-void ChatRoom::TcpServer::setMessageCallback(MessageCallback &&cb)
+void ChatRoom::TcpServer::setMessageCallback(MessageCallback && cb)
 {
 	messageCallback_ = cb;
 }

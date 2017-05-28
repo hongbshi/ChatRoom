@@ -9,7 +9,7 @@
 namespace ChatRoom
 {
 	//have connected
-	class TcpConnection:public std::enable_shared_from_this<TcpConnection>
+	class TcpConnection: public std::enable_shared_from_this<TcpConnection>
 	{
 	private:
 		enum sockStates
@@ -26,9 +26,11 @@ namespace ChatRoom
 		//use getOutputBuffer first
 		typedef std::function<void(TcpConnectionPtr, Buffer*)> MessageCallback;
 
-		TcpConnection(EventLoop* loop,int sockfd,
-		struct sockaddr_in localAddress,
-		struct sockaddr_in peerAddress,const std::string& name);
+		TcpConnection(EventLoop* loop,
+		int sockfd,
+		const struct sockaddr_in * localAddress,
+		const struct sockaddr_in * peerAddress, 
+		const std::string & name);
 		~TcpConnection();
 
 		//when connect was completed,it was been called.

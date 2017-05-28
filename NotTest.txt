@@ -1,2 +1,6 @@
 TcPConnection.cc TcpServer.cc 
 Http related
+
+g++ -std=c++11 -o EventTest.out Acceptor.cc Buffer.cc Channel.cc Condition.cc Epoll.cc EventLoop.cc MutexLock.cc MutexLockGuard.cc Socket.cc TcpConnection.cc TcpServer.cc Thread.cc ThreadPool.cc Test_EventLoop.c -lpthread
+
+

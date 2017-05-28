@@ -21,7 +21,7 @@ namespace ChatRoom
 		//typedef std::function<void(TcpConnectionPtr ptr)> WriteCompleteCallback();
 		typedef std::function<void(TcpConnectionPtr ptr, Buffer* buff)> MessageCallback;
 		typedef std::function<void(TcpConnectionPtr ptr)> CloseCallback;
-		TcpServer(EventLoop* loop, const struct sockaddr* listenAddr, bool reusePort = false);
+		TcpServer(EventLoop *loop, const struct sockaddr_in * listenAddr, bool reusePort = false);
 	
 		void setThreadNum(const unsigned int num);
 		void setThreadInitialCallback(ThreadInitialCallback && initial);
@@ -38,7 +38,7 @@ namespace ChatRoom
 		void removeConnection(TcpConnectionPtr ptr);
 		void removeConnectionInLoop(TcpConnectionPtr ptr);
 		EventLoop* loop_;
-		struct sockaddr listenAddr_;
+		struct sockaddr_in listenAddr_;
 		bool reusePort_;
 		unsigned int threadNum_;
 		ThreadInitialCallback threadInitialCallback_;

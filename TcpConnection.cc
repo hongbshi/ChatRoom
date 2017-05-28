@@ -11,13 +11,13 @@ using namespace ChatRoom;
 int ChatRoom::TcpConnection::number = 1;
 ChatRoom::TcpConnection::TcpConnection(EventLoop * loop, 
 	int sockfd, 
-	sockaddr_in localAddress, 
-	sockaddr_in peerAddress,
-	const std::string& name):
+	const struct sockaddr_in * localAddress, 
+	const struct sockaddr_in * peerAddress,
+	const std::string & name):
 	loop_(loop),
 	sockfd_(sockfd),
-	localAddress_(localAddress), 
-	peerAddress_(peerAddress),
+	localAddress_(*localAddress), 
+	peerAddress_(*peerAddress),
 	name_(name),
 	sockState_(kConnecting), 
 	channel_(std::make_shared<Channel>(sockfd_)),
@@ -32,6 +32,7 @@ ChatRoom::TcpConnection::TcpConnection(EventLoop * loop,
 	channel_->setErrorCallback(std::bind(&TcpConnection::handleError, shared_from_this()));
 	channel_->setWriteCallback(std::bind(&TcpConnection::handleWrite, shared_from_this()));
 }
+
 ChatRoom::TcpConnection::~TcpConnection()
 {
 	closeSocket(sockfd_);

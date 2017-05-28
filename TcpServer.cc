@@ -1,3 +1,4 @@
+#include "Socket.h"
 #include "TcpServer.h"
 #include "TcpConnection.h"
 #include "Acceptor.h"
@@ -5,14 +6,17 @@
 #include <stdio.h>
 
 using namespace ChatRoom;
-void ChatRoom::TcpServer::newConnection(int sockfd, const sockaddr & clientAddr)
+void ChatRoom::TcpServer::newConnection(int sockfd, const struct sockaddr & clientAddr)
 {
 	char buff[32];
 	int number = ChatRoom::TcpConnection::getNumber();
 	snprintf(buff,sizeof buff, "%s,%d","TcpConnection", number);
 	std::string name(buff);
 	std::shared_ptr<TcpConnection> conn =
-		std::make_shared<TcpConnection>(loop_, sockfd, listenAddr_, clientAddr,
+		std::make_shared<TcpConnection>(loop_, 
+			sockfd, 
+			listenAddr_, 
+			sockaddr_in_cast(&clientAddr),
 			name);
 	conn->setConnectedCallback(newConnectionCallback_);
 	conn->setMessageCallback(messageCallback_);
@@ -36,12 +40,12 @@ void ChatRoom::TcpServer::removeConnectionInLoop(TcpConnectionPtr ptr)
 }
 
 ChatRoom::TcpServer::TcpServer(EventLoop * loop, 
-	const sockaddr * listenAddr, bool reusePort)
+	const struct sockaddr_in * listenAddr, bool reusePort)
 	:loop_(loop),listenAddr_(*listenAddr),reusePort_(reusePort),
 	threadNum_(0),threadInitialCallback_()
 {
-	acceptor_ = std::make_shared<Acceptor>(loop,listenAddr,reusePort);
-	acceptor_->setNewConnectCallback(std::bind(&TcpServer::newConnection, this));
+	acceptor_ = std::make_shared<Acceptor>(loop, listenAddr, reusePort);
+	acceptor_-> setNewConnectCallback(std::bind(&TcpServer::newConnection, this));
 	threadPool_ = nullptr;
 }
 

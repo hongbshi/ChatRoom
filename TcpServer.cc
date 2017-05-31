@@ -6,6 +6,7 @@
 #include <stdio.h>
 
 using namespace ChatRoom;
+using namespace std::placeholders;
 void ChatRoom::TcpServer::newConnection(int sockfd, const struct sockaddr & clientAddr)
 {
 	char buff[32];
@@ -15,13 +16,13 @@ void ChatRoom::TcpServer::newConnection(int sockfd, const struct sockaddr & clie
 	std::shared_ptr<TcpConnection> conn =
 		std::make_shared<TcpConnection>(loop_, 
 			sockfd, 
-			listenAddr_, 
+			&listenAddr_, 
 			sockaddr_in_cast(&clientAddr),
 			name);
 	conn->setConnectedCallback(newConnectionCallback_);
 	conn->setMessageCallback(messageCallback_);
 	//conn->setWriteCallback(writeCompleteCallback_);
-	conn->setCloseCallback(std::bind(&TcpServer::removeConnection,this));
+	conn->setCloseCallback(std::bind(&TcpServer::removeConnection,this,_1));
 	conn_[name] = conn;
 	EventLoop* loop= threadPool_->getNext();
 	loop->runInLoop(std::bind(&TcpConnection::connectEstablished,conn));
@@ -45,7 +46,7 @@ ChatRoom::TcpServer::TcpServer(EventLoop * loop,
 	threadNum_(0),threadInitialCallback_()
 {
 	acceptor_ = std::make_shared<Acceptor>(loop, listenAddr, reusePort);
-	acceptor_-> setNewConnectCallback(std::bind(&TcpServer::newConnection, this));
+	acceptor_-> setNewConnectCallback(std::bind(&TcpServer::newConnection, this,_1,_2));
 	threadPool_ = nullptr;
 }
 

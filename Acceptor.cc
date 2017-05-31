@@ -16,7 +16,7 @@ ChatRoom::Acceptor::Acceptor(EventLoop * loop,
 	newConnectCallback_ (nullptr),
 	listening_ (false)
 {
-	bindAddress(sockfd_, listenAddr, sizeof listenAddr);
+	bindAddress(sockfd_, sockaddr_cast(listenAddr), sizeof listenAddr);
 	setReuseAddr(sockfd_);
 	if (reusePort) setReusePort(sockfd_);
 	channel_.setReadCallback(std::bind(&Acceptor::handleRead, this));

@@ -14,7 +14,7 @@ ChatRoom::HttpServer::HttpServer(EventLoop * loop,
 	loop_(loop),
 	listenAddr_(*listenAddr),
 	reusePort_(reusePort),
-	server_(loop,listenAddr_,reusePort),
+	server_(loop,listenAddr,reusePort),
 	threadNum_(0)
 {
 	newConnCb_ = nullptr;

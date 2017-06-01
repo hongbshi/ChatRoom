@@ -80,23 +80,27 @@ void ChatRoom::TcpConnection::shutdownWrite()
 //{
 //}
 
+void ChatRoom::TcpConnection::send(std::string & s)
+{
+	loop_->runInLoop(std::bind(&TcpConnection::sendInLoop, shared_from_this(),s));
+}
+
 void ChatRoom::TcpConnection::send(std::string && s)
 {
 	loop_->runInLoop(std::bind(&TcpConnection::sendInLoop, shared_from_this(),std::move(s)));
 }
 
-//void ChatRoom::TcpConnection::send(std::string && s)
-//{s
-//}
-
-void ChatRoom::TcpConnection::send(Buffer && buff)
+void ChatRoom::TcpConnection::send(const Buffer & buff)
 {
 	send(buff.getString());
 }
 
-//void ChatRoom::TcpConnection::send(Buffer && buff)
-//{
-//}
+void ChatRoom::TcpConnection::send(Buffer & buff)
+{
+	std::string str;
+	buff.readFromBuffer(str);
+	send(std::move(str));
+}
 
 void ChatRoom::TcpConnection::handleRead()
 {

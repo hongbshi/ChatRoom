@@ -1,7 +1,10 @@
 #ifndef  ChatRoom_TcpConnection_H
 #define  ChatRoom_TcpConnection_H
 
+#include <sys/types.h>
+#include <sys/socket.h>
 #include <netinet/in.h>
+#include <sys/uio.h>
 #include <memory>
 #include "Channel.h"
 #include "Buffer.h"
@@ -60,10 +63,10 @@ namespace ChatRoom
 		void connectEstablished();
 		void connectDestroyed();
 
+		void send(std::string & s);
 		void send(std::string && s);
-		//void send(std::string&& s);
-		void send(Buffer && buff);
-		//void send(Buffer&& buff);
+		void send(Buffer & buff);
+		void send(const Buffer & buff);
 
 		void close();
 		void shutdownWrite();

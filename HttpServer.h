@@ -21,9 +21,10 @@ namespace ChatRoom
 			const struct sockaddr_in *listenAddr,
 			bool reusePort = false);
 		void setThreadNumber(const unsigned int num);
-		void setNewConnectionCallback(NewConnectionCallback& cb) { newConnCb_ = cb; }
-		void setMessageCallback(MessageCallback& cb) { messageCb_ = cb; }
-		void setCloseCallback(CloseCallback& cb) { closeCb_ = cb; }
+		void setThreadInitialCallback(const ThreadInitial & cb) { threadCb_ = cb; }
+		void setNewConnectionCallback(const NewConnectionCallback& cb) { newConnCb_ = cb; }
+		void setMessageCallback(const MessageCallback& cb) { messageCb_ = cb; }
+		void setCloseCallback(const CloseCallback& cb) { closeCb_ = cb; }
 		void start();
 	private:
 		void newCb(TcpConnectionPtr ptr);
@@ -33,7 +34,7 @@ namespace ChatRoom
 		void closeCb(TcpConnectionPtr ptr);
 		void threadInitial(EventLoop*);
 		EventLoop* loop_;
-		struct sockaddr listenAddr_;
+		struct sockaddr_in listenAddr_;
 		bool reusePort_;
 		TcpServer server_;
 		unsigned int threadNum_;

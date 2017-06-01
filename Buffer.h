@@ -16,14 +16,14 @@ namespace ChatRoom
 			store_.clear();
 		}
 		//Clear the dst
-		int readFromBuffer(std::string& src);
-		int readFromBuffer(char* dst,int len);
-		int writeToBuffer(const char* src);
+		int readFromBuffer(std::string & src);
+		int readFromBuffer(char *dst,int len);
+		int writeToBuffer(const char *src);
 		int writeToBuffer(const std::string& src);
 		int writeToBuffer(Buffer& src); //src will be cleared
 		//
 		const char* readCRLF();
-		std::string readUntilCRLF(const char* ptr);
+		std::string readUntilCRLF(const char *ptr);
 		void retrival(const char* str) {
 			const char* start = getBegin();
 			readIndex_ += (str - start);
@@ -35,7 +35,7 @@ namespace ChatRoom
 		ssize_t readFromFile(const char* path, int* Errno);
 		//other Function
 		std::string getString() const;
-		std::string getStringLen(int& len) const;
+		std::string getStringLen(int & len) const;
 		int readable() const { return writeIndex_ - readIndex_; }
 		int writable() const { return store_.capacity() - writeIndex_ - 1; }
 		void clear() { readIndex_ = writeIndex_ = 0; }

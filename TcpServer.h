@@ -5,6 +5,8 @@
 #include <functional>
 #include <sys/types.h>
 #include <sys/socket.h>
+#include <netinet/in.h>
+#include <sys/uio.h>
 namespace ChatRoom
 {
 	class EventLoop;

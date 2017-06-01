@@ -60,9 +60,9 @@ namespace ChatRoom
 		void connectEstablished();
 		void connectDestroyed();
 
-		void send(std::string&& s);
+		void send(std::string && s);
 		//void send(std::string&& s);
-		void send(Buffer&& buff);
+		void send(Buffer && buff);
 		//void send(Buffer&& buff);
 
 		void close();

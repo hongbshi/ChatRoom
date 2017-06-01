@@ -82,11 +82,11 @@ void ChatRoom::TcpConnection::shutdownWrite()
 
 void ChatRoom::TcpConnection::send(std::string && s)
 {
-	loop_->runInLoop(std::bind(&TcpConnection::sendInLoop, shared_from_this(),s));
+	loop_->runInLoop(std::bind(&TcpConnection::sendInLoop, shared_from_this(),std::move(s)));
 }
 
 //void ChatRoom::TcpConnection::send(std::string && s)
-//{
+//{s
 //}
 
 void ChatRoom::TcpConnection::send(Buffer && buff)

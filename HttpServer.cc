@@ -5,8 +5,11 @@
 #include "TcpConnection.h"
 #include "HttpContext.h"
 #include "HttpResponse.h"
+
+using namespace ChatRoom;
+using namespace std::placeholders;
 ChatRoom::HttpServer::HttpServer(EventLoop * loop, 
-	const sockaddr * listenAddr, 
+	const struct sockaddr_in * listenAddr, 
 	bool reusePort):
 	loop_(loop),
 	listenAddr_(*listenAddr),
@@ -15,12 +18,12 @@ ChatRoom::HttpServer::HttpServer(EventLoop * loop,
 	threadNum_(0)
 {
 	newConnCb_ = nullptr;
-	messageCb_ = defaultMessageCb;
+	messageCb_ = std::bind(&HttpServer::defaultMessageCb,this,_1,_2);
 	closeCb_ = nullptr;
-	server_.setNewConnectionCallback(std::bind(&HttpServer::newConnCb_, this));
-	server_.setMessageCallback(std::bind(&HttpServer::messageCb, this));
-	server_.setCloseCallback(std::bind(&HttpServer::closeCb, this));
-	server_.setThreadInitialCallback(std::bind(&HttpServer::threadInitial, this));
+	server_.setNewConnectionCallback(std::bind(&HttpServer::newCb, this,_1));
+	server_.setMessageCallback(std::bind(&HttpServer::messageCb, this,_1,_2));
+	server_.setCloseCallback(std::bind(&HttpServer::closeCb, this,_1));
+	server_.setThreadInitialCallback(std::bind(&HttpServer::threadInitial, this,_1));
 }
 
 void ChatRoom::HttpServer::setThreadNumber(unsigned int num)
@@ -37,7 +40,7 @@ void ChatRoom::HttpServer::start()
 void ChatRoom::HttpServer::newCb(TcpConnectionPtr ptr)
 {
 	//if (ptr->disConnected())
-	printf("New connection %s created",ptr->getName());
+	printf("New connection %s created",ptr->getName().c_str());
 	//else
 	//	printf("Connection %s destroyed",ptr->getName());
 	ptr->setContext(std::make_shared<HttpContext>());
@@ -72,7 +75,7 @@ void ChatRoom::HttpServer::defaultMessageCb(const HttpRequest & request, HttpRes
 
 void ChatRoom::HttpServer::closeCb(TcpConnectionPtr ptr)
 {
-	printf("Connection %s destroyed", ptr->getName());
+	printf("Connection %s destroyed", ptr->getName().c_str());
 	if (closeCb_) closeCb_(ptr);
 }
 

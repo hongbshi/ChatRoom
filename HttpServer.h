@@ -18,7 +18,7 @@ namespace ChatRoom
 		typedef std::function<void(const HttpRequest&, HttpResponse&)> MessageCallback;
 		typedef std::function<void(TcpConnectionPtr)> CloseCallback;
 		HttpServer(EventLoop* loop, 
-			const struct sockaddr* listenAddr,
+			const struct sockaddr_in *listenAddr,
 			bool reusePort = false);
 		void setThreadNumber(const unsigned int num);
 		void setNewConnectionCallback(NewConnectionCallback& cb) { newConnCb_ = cb; }

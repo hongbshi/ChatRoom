@@ -2,6 +2,7 @@
 #include "Thread.h"
 #include "EventLoop.h"
 
+using namespace ChatRoom;
 ChatRoom::ThreadPool::ThreadPool(EventLoop* loop,
 	ThreadFunctor initialCallback, 
 	const unsigned int threadNum):
@@ -29,7 +30,6 @@ void ChatRoom::ThreadPool::start()
 		loops_[i] = threads_[i]->startloop();
 }
 
-using namespace ChatRoom;
 EventLoop* ChatRoom::ThreadPool::getNext()
 {
 	if(!threadNum_)

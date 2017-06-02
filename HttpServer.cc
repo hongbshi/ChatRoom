@@ -35,12 +35,13 @@ void ChatRoom::HttpServer::setThreadNumber(unsigned int num)
 void ChatRoom::HttpServer::start()
 {
 	server_.start();
+	printf("HttpServer start. HttpServer.cc, HttpServer::start function.\n");
 }
 
 void ChatRoom::HttpServer::newCb(TcpConnectionPtr ptr)
 {
 	//if (ptr->disConnected())
-	printf("New connection %s created",ptr->getName().c_str());
+	printf("New connection %s created! HttpServer.cc, HttpServer::newCb function\n",ptr->getName().c_str());
 	//else
 	//	printf("Connection %s destroyed",ptr->getName());
 	ptr->setContext(std::make_shared<HttpContext>());
@@ -75,12 +76,12 @@ void ChatRoom::HttpServer::defaultMessageCb(const HttpRequest & request, HttpRes
 
 void ChatRoom::HttpServer::closeCb(TcpConnectionPtr ptr)
 {
-	printf("Connection %s destroyed", ptr->getName().c_str());
+	printf("Connection %s destroyed! HttpServer.cc, HttpServer::closeCb function.\n", ptr->getName().c_str());
 	if (closeCb_) closeCb_(ptr);
 }
 
 void ChatRoom::HttpServer::threadInitial(EventLoop* loop)
 {
-	printf("New thread created");
+	printf("New thread created. HttpServer.cc, HttpServer::threadInitial function.\n");
 	if (threadCb_) threadCb_(loop);
 }

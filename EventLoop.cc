@@ -37,12 +37,13 @@ void ChatRoom::EventLoop::loop()
 	looping_ = true;
 	while (!quit_)
 	{
-		epoll_->poll(kEpollTimeoutMs_,activeChannel_);
+		epoll_->poll(kEpollTimeoutMs_, activeChannel_);
 		for (int i = 0; i < activeChannel_.size(); i++)
 		{
 			activeChannel_[i]->handleEvent();
 		}
 		doPendingFunctors();
+		//printf("%d\n", getCurrentThreadTid());
 	}
 }
 

@@ -15,7 +15,7 @@ namespace ChatRoom
 	public:
 		typedef std::function<void()> Functor;
 		typedef std::function<void(EventLoop*)> ThreadInitial;
-		Thread(ThreadInitial initialCallback = 0);
+		Thread(ThreadInitial initialCallback = ThreadInitial());
 		~Thread();
 		EventLoop* startloop();
 	private:

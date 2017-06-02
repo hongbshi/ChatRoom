@@ -43,7 +43,7 @@ namespace ChatRoom
 		//	return httpVersion_;
 		//}
 
-		void setStatus(HttpResponseStatus && code) {
+		void setStatus(const HttpResponseStatus & code) {
 			statusCode_ = code; 
 			switch (code){
 			case k200Succeed:
@@ -65,17 +65,21 @@ namespace ChatRoom
 		//	return statusMessage_; 
 		//}
 
-		void addHeader(const string &name, const string &val) { 
+		void addHeader(const string & name, const string & val) { 
 			header_.insert(std::make_pair(name, val));
 		}
 
-		void setBody(string && body) { body_ = body; }
+		void setBody(string & body) { body_ = body; }
 
-		void setFilePath(string && path) { filePath_ = path; }
+		void setBody(string && body) { body_ = std::move(body); }
 
-		void appendToBuffer(Buffer& buff);
+		void setFilePath(string & path) { filePath_ = path; }
 
-		void appendFileToBuffer(Buffer& buff);
+		void setFilePath(string && path) { filePath_ = std::move(path); }
+
+		void appendToBuffer(Buffer & buff);
+
+		void appendFileToBuffer(Buffer & buff);
 
 	private:
 		HttpVersion httpVersion_;

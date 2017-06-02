@@ -55,19 +55,34 @@ void ChatRoom::TcpServer::setThreadNum(const unsigned int num)
 	threadNum_ = num;
 }
 
-void ChatRoom::TcpServer::setThreadInitialCallback(ThreadInitialCallback&& initial)
+void ChatRoom::TcpServer::setThreadInitialCallback(ThreadInitialCallback & initial)
 {
 	threadInitialCallback_ = initial;
 }
 
-void ChatRoom::TcpServer::setNewConnectionCallback(NewConnectionCallback && cb)
+void ChatRoom::TcpServer::setThreadInitialCallback(ThreadInitialCallback && initial)
+{
+	threadInitialCallback_ = std::move(initial);
+}
+
+void ChatRoom::TcpServer::setNewConnectionCallback(NewConnectionCallback & cb)
 {
 	newConnectionCallback_ = cb;
 }
 
-void ChatRoom::TcpServer::setMessageCallback(MessageCallback && cb)
+void ChatRoom::TcpServer::setNewConnectionCallback(NewConnectionCallback && cb)
+{
+	newConnectionCallback_ = std::move(cb);
+}
+
+void ChatRoom::TcpServer::setMessageCallback(MessageCallback & cb)
 {
 	messageCallback_ = cb;
+}
+
+void ChatRoom::TcpServer::setMessageCallback(MessageCallback && cb)
+{
+	messageCallback_ = std::move(cb);
 }
 
 //void ChatRoom::TcpServer::setWriteCompleteCallback(WriteCompleteCallback &&cb)
@@ -75,9 +90,14 @@ void ChatRoom::TcpServer::setMessageCallback(MessageCallback && cb)
 //	writeCompleteCallback_ = cb;
 //}
 
-void ChatRoom::TcpServer::setCloseCallback(CloseCallback &&cb)
+void ChatRoom::TcpServer::setCloseCallback(CloseCallback & cb)
 {
 	closeCallback_ = cb;
+}
+
+void ChatRoom::TcpServer::setCloseCallback(CloseCallback &&cb)
+{
+	closeCallback_ = std::move(cb);
 }
 
 void ChatRoom::TcpServer::start()
@@ -85,4 +105,5 @@ void ChatRoom::TcpServer::start()
 	threadPool_ = std::make_shared<ThreadPool>(loop_,threadInitialCallback_, threadNum_);
 	threadPool_->start();
 	acceptor_->listen();
+	printf("%s\n", "TcpServer start ok! TcpServer.cc, TcpServer::start function");
 }

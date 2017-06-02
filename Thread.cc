@@ -90,7 +90,7 @@ void ChatRoom::Thread::run()
 	loop.loop();
 }
 
-void* ChatRoom::internalThreadStart(void *data)
+void* ChatRoom::internalThreadStart(void * data)
 {
 	ThreadData *threadData = (ThreadData*)(data);
 	//run the fun

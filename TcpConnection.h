@@ -59,7 +59,7 @@ namespace ChatRoom
 
 		void setStates(sockStates states) { sockState_ = states; }
 		static int getNumber() { return ++number; }
-		const std::string& getName() { return name_; }
+		const std::string & getName() { return name_; }
 		void connectEstablished();
 		void connectDestroyed();
 

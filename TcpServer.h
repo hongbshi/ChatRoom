@@ -26,12 +26,19 @@ namespace ChatRoom
 		TcpServer(EventLoop *loop, const struct sockaddr_in * listenAddr, bool reusePort = false);
 	
 		void setThreadNum(const unsigned int num);
+
+		void setThreadInitialCallback(ThreadInitialCallback & initial);
 		void setThreadInitialCallback(ThreadInitialCallback && initial);
 
+		void setNewConnectionCallback(NewConnectionCallback & cb);
 		void setNewConnectionCallback(NewConnectionCallback && cb);
+
+		void setMessageCallback(MessageCallback & cb);
 		void setMessageCallback(MessageCallback && cb);
 		//void setWriteCompleteCallback(WriteCompleteCallback &&cb);
+		void setCloseCallback(CloseCallback & cb);
 		void setCloseCallback(CloseCallback && cb);
+
 		void start();
 	private:
 		//For Acceptor 

@@ -11,26 +11,33 @@
 #include "EventLoop.h"
 #include "HttpRequest.h"
 #include "HttpResponse.h"
+#include "TcpConnection.h"
 
 using namespace std;
 using namespace ChatRoom;
 using namespace std::placeholders;
 
 typedef std::shared_ptr<TcpConnection> TcpConnectionPtr;
-void thrdInitial(EventLoop *loop){
+typedef HttpResponse::HttpResponseStatus HttpResponseStatus;
 
+void thrdInitial(EventLoop *loop){
+	printf("%s\n", "Thread initial. HttpServerTest.cc, thrdInitial function.");
 }
 
 void newCb(TcpConnectionPtr ptr){
-
+	printf("%s Connection coming. HttpServerTest.cc, thrdInitial function.\n", ptr->getName().c_str());
 }
 
-void messCb(const HttpRequest&, HttpResponse&){
-
+void messCb(const HttpRequest& request, HttpResponse& response){
+	response.setHttpVersion("HTTP/1.1");
+	HttpResponseStatus status = HttpResponseStatus::k200Succeed;
+	response.setStatus(status);
+	std::string str("<html><head><title>Test</title></head><body><p>body First time</p><p>title HeHe</p></body></html>");
+	response.setBody(str);
 }
 
 void closeCb(TcpConnectionPtr ptr){
-
+	printf("%s Connection closed. HttpServerTest.cc, thrdInitial function.\n", ptr->getName().c_str());
 }
 
 int main(int argc,char *argv[]){
@@ -51,6 +58,7 @@ int main(int argc,char *argv[]){
  	httpServ.setNewConnectionCallback(std::bind(&newCb,_1));
  	httpServ.setMessageCallback(std::bind(&messCb,_1,_2));
  	httpServ.setCloseCallback(std::bind(&closeCb,_1));
+ 	httpServ.setThreadNumber(10);
  	httpServ.start();
  	loop.loop();
  	return 0;

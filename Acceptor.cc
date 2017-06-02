@@ -22,9 +22,14 @@ ChatRoom::Acceptor::Acceptor(EventLoop * loop,
 	channel_.setReadCallback(std::bind(&Acceptor::handleRead, this));
 }
 
-void ChatRoom::Acceptor::setNewConnectCallback(NewConnectCallback && cb)
+void ChatRoom::Acceptor::setNewConnectCallback(NewConnectCallback & cb)
 {
 	newConnectCallback_ = cb;
+}
+
+void ChatRoom::Acceptor::setNewConnectCallback(NewConnectCallback && cb)
+{
+	newConnectCallback_ = std::move(cb);
 }
 
 bool ChatRoom::Acceptor::isListening()
@@ -38,6 +43,7 @@ void ChatRoom::Acceptor::listen()
 	channel_.enableRead();
 	loop_->updateChannle(&channel_);
 	listening_ = true;
+	printf("%s\n", "Acceptor is listening! Acceptor.cc, Acceptor::listen function");
 }
 
 ChatRoom::Acceptor::~Acceptor()

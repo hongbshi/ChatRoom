@@ -9,23 +9,30 @@ using namespace ChatRoom;
 using namespace std::placeholders;
 void ChatRoom::TcpServer::newConnection(int sockfd, const struct sockaddr & clientAddr)
 {
+	printf("TcpServer newConnection come. File: TcpServer.cc, TcpServer::newConnection function.\n");
 	char buff[32];
 	int number = ChatRoom::TcpConnection::getNumber();
 	snprintf(buff,sizeof buff, "%s,%d","TcpConnection", number);
 	std::string name(buff);
+	printf("%s\n", buff);
+	EventLoop* loop= threadPool_->getNext();
+	const struct sockaddr_in * addr = sockaddr_in_cast(&clientAddr);
 	std::shared_ptr<TcpConnection> conn =
-		std::make_shared<TcpConnection>(loop_, 
+		std::make_shared<TcpConnection>(loop, 
 			sockfd, 
 			&listenAddr_, 
-			sockaddr_in_cast(&clientAddr),
+			addr,
 			name);
+	printf("conn established. File: TcpServer.cc, TcpServer::newConnection function.\n");
 	conn->setConnectedCallback(newConnectionCallback_);
 	conn->setMessageCallback(messageCallback_);
 	//conn->setWriteCallback(writeCompleteCallback_);
+	printf("setCloseCallback. File: TcpServer.cc, TcpServer::newConnection function.\n");
 	conn->setCloseCallback(std::bind(&TcpServer::removeConnection,this,_1));
 	conn_[name] = conn;
-	EventLoop* loop= threadPool_->getNext();
+	printf("Thread pool thread. File: TcpServer.cc, TcpServer::newConnection function.\n");
 	loop->runInLoop(std::bind(&TcpConnection::connectEstablished,conn));
+	printf("File: TcpServer.cc, TcpServer::newConnection function end.\n");
 }
 
 void ChatRoom::TcpServer::removeConnection(TcpConnectionPtr ptr)
@@ -41,12 +48,13 @@ void ChatRoom::TcpServer::removeConnectionInLoop(TcpConnectionPtr ptr)
 }
 
 ChatRoom::TcpServer::TcpServer(EventLoop * loop, 
-	const struct sockaddr_in * listenAddr, bool reusePort)
+	const struct sockaddr_in * listenAddr,
+	bool reusePort)
 	:loop_(loop),listenAddr_(*listenAddr),reusePort_(reusePort),
 	threadNum_(0),threadInitialCallback_()
 {
 	acceptor_ = std::make_shared<Acceptor>(loop, listenAddr, reusePort);
-	acceptor_-> setNewConnectCallback(std::bind(&TcpServer::newConnection, this,_1,_2));
+	acceptor_-> setNewConnectCallback(std::bind(&TcpServer::newConnection, this, _1, _2));
 	threadPool_ = nullptr;
 }
 

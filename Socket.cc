@@ -1,5 +1,6 @@
 #include "Socket.h"
 
+#include <stdio.h>
 #include <fcntl.h>
 #include <unistd.h>
 #include <errno.h>
@@ -25,6 +26,13 @@ int ChatRoom::bindAddress(int sockfd,
 	const struct sockaddr * addr, 
 	socklen_t length)
 {
+	printf("Bind sockfd is %d. File: Socket.cc, ChatRoom::bindAddress function.\n", sockfd);
+	const struct sockaddr_in *tmp = sockaddr_in_cast(addr);
+	int port = ntohs(tmp->sin_port);
+	printf("Bind port is %d. File: Socket.cc, ChatRoom::bindAddress function.\n", port);
+	char ip[64];
+	inet_ntop(AF_INET,(const void*)(&(tmp->sin_addr)),ip,60);
+	printf("Bind ip is %s. File: Socket.cc, ChatRoom::bindAddress function.\n", ip);
 	return bind(sockfd, addr, length);
 }
 

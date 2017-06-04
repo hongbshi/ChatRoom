@@ -23,7 +23,7 @@ namespace ChatRoom
 		bool hasChannel(Channel* ch);
 	private:
 		void update(int operation, Channel* ch);
-		void fillActiveChannel(std::vector<Channel*>& activeChannel);
+		void fillActiveChannel(int number, std::vector<Channel*>& activeChannel);
 		typedef std::vector<epoll_event> EventList;
 		int epollfd_;
 		EventList event_;

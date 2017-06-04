@@ -27,7 +27,7 @@ void Channel::handleEvent()
 		closeCallback_();
 }
 
-int const  Channel::kNoneEvent = 0;
+int const Channel::kNoneEvent = 0;
 int const Channel::kReadEvent = EPOLLIN | EPOLLPRI;
 int const Channel::kWriteEvent = EPOLLOUT;
 

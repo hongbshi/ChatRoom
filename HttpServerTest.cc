@@ -46,12 +46,15 @@ int main(int argc,char *argv[]){
 		printf("%s\n", "<Ip> <Port>");
 		return -1;
 	}
-	int port = atoi(argv[2]);
 	struct sockaddr_in serverAddr;
 	bzero(&serverAddr, sizeof(serverAddr));
+	int port = atoi(argv[2]);
+	printf("Listen port is %d. File : HttpServerTest.cc, main funcion.\n", port);
   	serverAddr.sin_family = AF_INET;
   	serverAddr.sin_port = htons(port);
- 	inet_pton(AF_INET, argv[1], &serverAddr.sin_addr);
+ 	int result = inet_pton(AF_INET, argv[1], &serverAddr.sin_addr);
+ 	if(result == 0) printf("Invalid address! File : HttpServerTest.cc, main funcion.\n");
+ 	if(result == -1) printf("inet_pton function error! File : HttpServerTest.cc, main funcion.\n");
  	EventLoop loop;
  	HttpServer httpServ(&loop,&serverAddr,false);
  	httpServ.setThreadInitialCallback(std::bind(&thrdInitial,_1));

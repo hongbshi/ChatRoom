@@ -40,11 +40,13 @@ ChatRoom::TcpConnection::~TcpConnection()
 // Must in TcpConnection loop
 void ChatRoom::TcpConnection::connectEstablished()
 {
+	printf("TcpConnection connectEstablished. File: TcpConnection.cc, TcpConnection::connectEstablished function.\n");
 	assert(sockState_ == kConnecting);
 	setStates(kConnected);
 	channel_->enableRead();
 	loop_->updateChannle(&*channel_);
 	if (connectedCallback_) connectedCallback_(shared_from_this());
+	printf("File: TcpConnection.cc, TcpConnection::connectEstablished function end.\n");
 }
 // Must in TcpConnection loop
 void ChatRoom::TcpConnection::connectDestroyed()

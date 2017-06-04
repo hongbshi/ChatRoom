@@ -15,10 +15,11 @@ Epoll::Epoll()
 {
 	int size = event_.size();
 	int number = epoll_wait(epollfd_, &*event_.begin(), size, timeout);
-	if (0 < number)
+	printf("epoll event size is %d. File: Epoll.cc, Epoll::poll function.\n", number);
+	if (number > 0) 
 	{
-		fillActiveChannel(activeChannel);
-		if (number == size && size<Epoll_Listen_Size)
+		fillActiveChannel(number, activeChannel);
+		if (number == size && size < Epoll_Listen_Size)
 			event_.resize(2 * size);
 	}
 }
@@ -74,13 +75,14 @@ void Epoll::update(int operation,Channel* ch)
 		abort();
 }
 
-void Epoll::fillActiveChannel(std::vector<Channel*>& activeChannel)
+void Epoll::fillActiveChannel(int number, std::vector<Channel*>& activeChannel)
 {
-	int number = event_.size();
+	activeChannel.reserve(number);
 	for (int i = 0; i < number; i++)
 	{
 		Channel* tmp =static_cast<Channel*>(event_[i].data.ptr);
 		tmp->setReEvent(event_[i].events);
 		activeChannel.push_back(tmp);
 	}
+	printf("fillActiveChannel successful! File: Epoll.cc, Epoll::fillActiveChannel function.\n");
 }

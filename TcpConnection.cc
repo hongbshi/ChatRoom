@@ -27,10 +27,10 @@ ChatRoom::TcpConnection::TcpConnection(EventLoop * loop,
 	closeCallback_ = nullptr;
 	writeCallback_ = nullptr;
 	messageCallback_ = nullptr;
-	channel_->setCloseCallback(std::bind(&TcpConnection::handleClose, shared_from_this()));
-	channel_->setReadCallback(std::bind(&TcpConnection::handleRead, shared_from_this()));
-	channel_->setErrorCallback(std::bind(&TcpConnection::handleError, shared_from_this()));
-	channel_->setWriteCallback(std::bind(&TcpConnection::handleWrite, shared_from_this()));
+	channel_->setCloseCallback(std::bind(&TcpConnection::handleClose,this));
+	channel_->setReadCallback(std::bind(&TcpConnection::handleRead, this));
+	channel_->setErrorCallback(std::bind(&TcpConnection::handleError, this));
+	channel_->setWriteCallback(std::bind(&TcpConnection::handleWrite, this));
 }
 
 ChatRoom::TcpConnection::~TcpConnection()
@@ -159,7 +159,6 @@ void ChatRoom::TcpConnection::handleClose()
 	TcpConnectionPtr guard(shared_from_this());
 	if (connectedCallback_)
 		connectedCallback_(guard);
-	//tcpserver 提供一个函数 用于 从tcpserver 中删除 tcpconnection智能指针
 	if (closeCallback_)
 		closeCallback_(guard);
 }

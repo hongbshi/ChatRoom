@@ -64,7 +64,7 @@ void ChatRoom::Acceptor::handleRead()
 {
 	struct sockaddr clientAddr;
 	int connectFd = acceptConnect(sockfd_, &clientAddr, sizeof clientAddr);
-	printf("connectFd is %d. File : Acceptor.cc, Acceptor::handleRead funcion.\n", connectFd);
+	printf("ConnectFd is %d. File : Acceptor.cc, Acceptor::handleRead funcion.\n", connectFd);
 	if (connectFd >= 0)
 	{
 		if (newConnectCallback_)

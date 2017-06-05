@@ -17,6 +17,7 @@ namespace ChatRoom
 		{
 			readCallback_ = rcb;
 		}
+		
 		void setWriteCallback(const EventCallback& wcb)
 		{
 			writeCallback_ = wcb;
@@ -25,6 +26,7 @@ namespace ChatRoom
 		{
 			closeCallback_ = ccb;
 		}
+
 		void setErrorCallback(const EventCallback& ecb)
 		{
 			errorCallback_ = ecb;

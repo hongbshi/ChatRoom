@@ -7,6 +7,7 @@
 #include <sys/uio.h>
 #include <arpa/inet.h>
 
+#include "Thread.h"
 #include "HttpServer.h"
 #include "EventLoop.h"
 #include "HttpRequest.h"
@@ -25,7 +26,7 @@ void thrdInitial(EventLoop *loop){
 }
 
 void newCb(TcpConnectionPtr ptr){
-	printf("%s Connection coming. HttpServerTest.cc, thrdInitial function.\n", ptr->getName().c_str());
+	printf("%s Connection coming. HttpServerTest.cc, newCb function.\n", ptr->getName().c_str());
 }
 
 void messCb(const HttpRequest& request, HttpResponse& response){
@@ -37,7 +38,7 @@ void messCb(const HttpRequest& request, HttpResponse& response){
 }
 
 void closeCb(TcpConnectionPtr ptr){
-	printf("%s Connection closed. HttpServerTest.cc, thrdInitial function.\n", ptr->getName().c_str());
+	printf("%s Connection closed. HttpServerTest.cc, closeCb function.\n", ptr->getName().c_str());
 }
 
 int main(int argc,char *argv[]){
@@ -56,6 +57,7 @@ int main(int argc,char *argv[]){
  	if(result == 0) printf("Invalid address! File : HttpServerTest.cc, main funcion.\n");
  	if(result == -1) printf("inet_pton function error! File : HttpServerTest.cc, main funcion.\n");
  	EventLoop loop;
+ 	printf("Current Thread is %d, File : HttpServerTest.cc, main funcion.\n", getCurrentThreadTid());
  	HttpServer httpServ(&loop,&serverAddr,false);
  	httpServ.setThreadInitialCallback(std::bind(&thrdInitial,_1));
  	httpServ.setNewConnectionCallback(std::bind(&newCb,_1));

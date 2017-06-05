@@ -14,7 +14,7 @@ void ChatRoom::TcpServer::newConnection(int sockfd, const struct sockaddr & clie
 	int number = ChatRoom::TcpConnection::getNumber();
 	snprintf(buff,sizeof buff, "%s,%d","TcpConnection", number);
 	std::string name(buff);
-	printf("%s\n", buff);
+	//printf("%s\n", buff);
 	EventLoop* loop= threadPool_->getNext();
 	const struct sockaddr_in * addr = sockaddr_in_cast(&clientAddr);
 	std::shared_ptr<TcpConnection> conn =
@@ -23,7 +23,7 @@ void ChatRoom::TcpServer::newConnection(int sockfd, const struct sockaddr & clie
 			&listenAddr_, 
 			addr,
 			name);
-	printf("conn established. File: TcpServer.cc, TcpServer::newConnection function.\n");
+	printf("Conn established. File: TcpServer.cc, TcpServer::newConnection function.\n");
 	conn->setConnectedCallback(newConnectionCallback_);
 	conn->setMessageCallback(messageCallback_);
 	//conn->setWriteCallback(writeCompleteCallback_);

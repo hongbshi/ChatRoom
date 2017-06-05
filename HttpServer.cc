@@ -35,13 +35,13 @@ void ChatRoom::HttpServer::setThreadNumber(unsigned int num)
 void ChatRoom::HttpServer::start()
 {
 	server_.start();
-	printf("HttpServer start. HttpServer.cc, HttpServer::start function.\n");
+	printf("HttpServer start. File: HttpServer.cc, HttpServer::start function.\n");
 }
 
 void ChatRoom::HttpServer::newCb(TcpConnectionPtr ptr)
 {
 	//if (ptr->disConnected())
-	printf("New connection %s created! HttpServer.cc, HttpServer::newCb function\n",ptr->getName().c_str());
+	printf("New connection %s created! File: HttpServer.cc, HttpServer::newCb function\n",ptr->getName().c_str());
 	//else
 	//	printf("Connection %s destroyed",ptr->getName());
 	ptr->setContext(std::make_shared<HttpContext>());

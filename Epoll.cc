@@ -11,11 +11,11 @@ Epoll::Epoll()
 	event_.resize(initialSize);
 }
 
- void Epoll::poll(int timeout,std::vector<Channel*>& activeChannel)
+void Epoll::poll(int timeout,std::vector<Channel*>& activeChannel)
 {
 	int size = event_.size();
 	int number = epoll_wait(epollfd_, &*event_.begin(), size, timeout);
-	printf("epoll event size is %d. File: Epoll.cc, Epoll::poll function.\n", number);
+	printf("Epoll event size is %d. File: Epoll.cc, Epoll::poll function.\n", number);
 	if (number > 0) 
 	{
 		fillActiveChannel(number, activeChannel);
@@ -24,8 +24,8 @@ Epoll::Epoll()
 	}
 }
 
- void Epoll::updateChannel(Channel* ch)
- {
+void Epoll::updateChannel(Channel* ch)
+{
 	 int status = ch->getStatus();
 	 int fd = ch->getfd();
 	 if (status==kNew || status==kDeleted)
@@ -46,10 +46,10 @@ Epoll::Epoll()
 		 else
 			update(EPOLL_CTL_MOD, ch);
 	 }
- }
+}
 
- void Epoll::removeChannel(Channel* ch)
- {
+void Epoll::removeChannel(Channel* ch)
+{
 	 int status = ch->getStatus();
 	 int fd = ch->getfd();
 	 assert(status == kAdded || status==kDeleted);
@@ -58,7 +58,7 @@ Epoll::Epoll()
 	 auto it = activeChannel_.find(fd);
 	 activeChannel_.erase(it);
 	 ch->setStatus(kNew);
- }
+}
 
 bool Epoll::hasChannel(Channel* ch)
 {

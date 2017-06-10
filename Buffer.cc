@@ -70,7 +70,11 @@ int Buffer::writeToBuffer(const char* src)
 int ChatRoom::Buffer::writeToBuffer(const char * src, int len)
 {
 	if (src == nullptr) return 0;
-	if (writable() < len) store_.resize(2 * store_.capacity());
+	if (writable() < len) {
+		std::vector<char> tmp(2 * (len + store_.capacity()));
+		std::copy(&store_[readIndex_],&store_[writeIndex_],tmp.begin());
+		std::swap(tmp,store_);
+	}
 	memcpy(&store_[writeIndex_], src, len);
 	writeIndex_ += len;
 	return len;
@@ -89,7 +93,9 @@ ssize_t ChatRoom::Buffer::readSocket(int sockfd,int* Errno)
 	iov[1].iov_base = start2;
 	iov[1].iov_len = len2;
 	//Get read result
+	//printf("%d,%d,%d,%d\n",len1,len2,readIndex_,writeIndex_);
 	ssize_t result = readvFromSocket(sockfd, iov, 2);
+	//printf("Read %d bytes from %d. File: Buffer.cc, readSocket.\n", int(result),sockfd);
 	//Deal result
 	if (result > 0)
 	{
@@ -103,6 +109,11 @@ ssize_t ChatRoom::Buffer::readSocket(int sockfd,int* Errno)
 	}
 	else if (result < 0)
 		*Errno = errno;
+	//printf("%d,%d\n", readIndex_,writeIndex_);
+	//for(int i = readIndex_; i < writeIndex_; ++i){
+	//	printf("%c", store_[i]);
+	//}
+	//printf("Current buffer state is %s. File: Buffer.cc, readSocket.\n", getString().c_str());
 	return result;
 }
 

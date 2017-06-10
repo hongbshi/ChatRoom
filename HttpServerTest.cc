@@ -30,6 +30,7 @@ void newCb(TcpConnectionPtr ptr){
 }
 
 void messCb(const HttpRequest& request, HttpResponse& response){
+	printf("HttpServerTest messCb, File: HttpServerTest.cc, newCb function.\n");
 	response.setHttpVersion("HTTP/1.1");
 	HttpResponseStatus status = HttpResponseStatus::k200Succeed;
 	response.setStatus(status);
@@ -63,7 +64,7 @@ int main(int argc,char *argv[]){
  	httpServ.setNewConnectionCallback(std::bind(&newCb,_1));
  	httpServ.setMessageCallback(std::bind(&messCb,_1,_2));
  	httpServ.setCloseCallback(std::bind(&closeCb,_1));
- 	httpServ.setThreadNumber(10);
+ 	httpServ.setThreadNumber(1);
  	httpServ.start();
  	loop.loop();
  	return 0;

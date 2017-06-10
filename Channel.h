@@ -13,21 +13,23 @@ namespace ChatRoom
 	public:
 		typedef std::function<void()> EventCallback;
 		Channel(int fd);
-		void setReadCallback(const EventCallback& rcb)
+
+		void setReadCallback(const EventCallback & rcb)
 		{
 			readCallback_ = rcb;
 		}
 		
-		void setWriteCallback(const EventCallback& wcb)
+		void setWriteCallback(const EventCallback & wcb)
 		{
 			writeCallback_ = wcb;
 		}
-		void setCloseCallback(const EventCallback& ccb)
+
+		void setCloseCallback(const EventCallback & ccb)
 		{
 			closeCallback_ = ccb;
 		}
 
-		void setErrorCallback(const EventCallback& ecb)
+		void setErrorCallback(const EventCallback & ecb)
 		{
 			errorCallback_ = ecb;
 		}
@@ -36,22 +38,27 @@ namespace ChatRoom
 		{
 			Event_ |=  kReadEvent;
 		}
+
 		void disableRead()
 		{
 			Event_ &= ~kReadEvent;
 		}
+		
 		void enableWrite()
 		{
 			Event_ |= kWriteEvent;
 		}
+
 		void disableWrite()
 		{
 			Event_ &= ~kWriteEvent;
 		}
+
 		void disableAll()
 		{
 			Event_ &= kNoneEvent;
 		}
+
 		void enableAll()
 		{
 			Event_ &= kReadEvent;
@@ -62,30 +69,37 @@ namespace ChatRoom
 		{
 			return Event_ & kReadEvent;
 		}
+
 		bool isWrite()
 		{
 			return Event_ & kWriteEvent;
 		}
+
 		bool isNoneEvent()
 		{
 			return Event_ & (~kNoneEvent);
 		}
+
 		int getfd()
 		{
 			return fd_;
 		}
+
 		int getEvent()
 		{
 			return Event_;
 		}
+
 		int getStatus()
 		{
 			return status_;
 		}
+
 		void setStatus(int status)
 		{
 			status_ = status;
 		}
+		
 		void setReEvent(int revent)
 		{
 			reEvent_ = revent;

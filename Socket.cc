@@ -70,7 +70,7 @@ ssize_t ChatRoom::readFromSocket(int sockfd, void * buff, size_t length)
 	return read(sockfd,buff,length);
 }
 
-ssize_t ChatRoom::readvFromSocket(int sockfd, iovec * iov, int iovcnt)
+ssize_t ChatRoom::readvFromSocket(int sockfd, const iovec * iov, int iovcnt)
 {
 	return readv(sockfd, iov, iovcnt);
 }

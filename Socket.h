@@ -16,7 +16,7 @@ namespace ChatRoom
 	int closeSocket(int sockfd);
 	int shutdownSocket(int sockfd, int type);
 	ssize_t readFromSocket(int sockfd, void *buff, size_t length);
-	ssize_t readvFromSocket(int sockfd, struct iovec *iov, int iovcnt);
+	ssize_t readvFromSocket(int sockfd, const struct iovec *iov, int iovcnt);
 	ssize_t writeToSocket(int sockfd, const void *buff, size_t length);
 	ssize_t writevToSocket(int sockfd, const struct iovec *iov, int iovcnt);
 	//socket ops

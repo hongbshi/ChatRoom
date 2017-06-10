@@ -110,6 +110,7 @@ void ChatRoom::TcpConnection::handleRead()
 	int Errno;
 	//Get read result
 	int result = outputBuffer_.readSocket(sockfd_, &Errno);
+	printf("Read result is %d, File: TcpConnection.cc, TcpConnection::handleRead function.\n", result);
 	//Deal result
 	if (result > 0 && messageCallback_)
 		messageCallback_(shared_from_this(),&outputBuffer_);

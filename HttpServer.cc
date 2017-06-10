@@ -50,10 +50,14 @@ void ChatRoom::HttpServer::newCb(TcpConnectionPtr ptr)
 
 void ChatRoom::HttpServer::messageCb(TcpConnectionPtr ptr, Buffer * buff)
 {
+	printf("File: HttpServer.cc, HttpServer::messageCb function.\n");
+	std::string str = buff->getString();
+	printf("%s\n", str.c_str());
 	std::shared_ptr<HttpContext> cnt = 
 		std::static_pointer_cast<HttpContext>(ptr ->getContext());
 	cnt->parseRequest(buff);
 	if (cnt->getAll()) {
+		printf("HttpContext get all, File: HttpServer.cc, messageCb function.\n");
 		messageCbHelp(ptr, cnt->getRequest());
 		cnt->resetRequest();
 	}

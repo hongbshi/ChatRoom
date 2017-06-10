@@ -44,6 +44,9 @@ namespace ChatRoom
 		//For Acceptor 
 		void newConnection(int sockfd, const struct sockaddr& clientAddr);
 		//For TcpConnection
+		void connCb(TcpConnectionPtr ptr);
+		void messCb(TcpConnectionPtr ptr, Buffer* buff);
+		void closeCb(TcpConnectionPtr ptr);
 		void removeConnection(TcpConnectionPtr ptr);
 		void removeConnectionInLoop(TcpConnectionPtr ptr);
 		EventLoop* loop_;

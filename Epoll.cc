@@ -19,8 +19,7 @@ void Epoll::poll(int timeout,std::vector<Channel*>& activeChannel)
 	if (number > 0) 
 	{
 		fillActiveChannel(number, activeChannel);
-		if (number == size && size < Epoll_Listen_Size)
-			event_.resize(2 * size);
+		if (number == size && size < Epoll_Listen_Size) event_.resize(2 * size);
 	}
 }
 

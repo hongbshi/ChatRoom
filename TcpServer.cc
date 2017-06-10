@@ -17,7 +17,7 @@ void ChatRoom::TcpServer::newConnection(int sockfd, const struct sockaddr & clie
 	//printf("%s\n", buff);
 	EventLoop* loop= threadPool_->getNext();
 	const struct sockaddr_in * addr = sockaddr_in_cast(&clientAddr);
-	std::shared_ptr<TcpConnection> conn =
+	std::shared_ptr<TcpConnection> conn = 
 		std::make_shared<TcpConnection>(loop, 
 			sockfd, 
 			&listenAddr_, 

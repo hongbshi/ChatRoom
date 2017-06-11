@@ -3,24 +3,36 @@
 
 void ChatRoom::HttpContext::parseRequest(Buffer *buff)
 {
-	if (state_ == kCompleted) return;
-	const char *crlf = buff->readCRLF();
-	if (crlf == nullptr) return;
-	const char *start = buff->getBegin();
-	if (state_ == kExpectedRequestLine) {
-		//if (!parseRequestLine(start, crlf)) resetRequest();
-		//else state_ = kExpectedHeadLine;
-		if (parseRequestLine(start, crlf)) state_ = kExpectedHeadLine;
+	bool hasMore = true;
+	while(hasMore){
+		//std::string str = buff->getString();
+		//printf("%s\n", str.c_str());
+		if (state_ == kCompleted) break;
+		const char *crlf = buff->readCRLF();
+		if (crlf == nullptr) {
+			hasMore = false;
+			break;
+		}
+		const char *start = buff->getBegin();
+		if (state_ == kExpectedRequestLine) {
+			//if (!parseRequestLine(start, crlf)) resetRequest();
+			//else state_ = kExpectedHeadLine;
+			if (parseRequestLine(start, crlf)) state_ = kExpectedHeadLine;
+			else hasMore = false;
+		}
+		else if (state_ == kExpectedHeadLine) {
+			//if (crlf == start) state_ = kExpectedBody;
+			if (crlf == start) state_ = kCompleted;
+			else request_.addHeader(start, crlf);
+		}
+		else if (state_ == kExpectedBody) {
+			request_.setBody(start, crlf);
+			state_ = kCompleted;
+		}
+		buff->retrival(crlf + 2);
 	}
-	else if (state_ == kExpectedHeadLine) {
-		if (crlf == start) state_ = kExpectedBody;
-		else request_.addHeader(start, crlf);
-	}
-	else if (state_ == kExpectedBody) {
-		request_.setBody(start, crlf);
-		state_ = kCompleted;
-	}
-	buff->retrival(crlf + 2);
+	std::string str = buff->getString();
+	printf("%s\n", str.c_str());
 }
 
 bool ChatRoom::HttpContext::parseRequestLine(const char * start, const char * end)

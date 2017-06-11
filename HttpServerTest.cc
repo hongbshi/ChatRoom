@@ -30,11 +30,11 @@ void newCb(TcpConnectionPtr ptr){
 }
 
 void messCb(const HttpRequest& request, HttpResponse& response){
-	printf("HttpServerTest messCb, File: HttpServerTest.cc, newCb function.\n");
+	printf("HttpServerTest messCb, File: HttpServerTest.cc, messCb function.\n");
 	response.setHttpVersion("HTTP/1.1");
 	HttpResponseStatus status = HttpResponseStatus::k200Succeed;
 	response.setStatus(status);
-	std::string str("<html><head><title>Test</title></head><body><p>body First time</p><p>title HeHe</p></body></html>");
+	std::string str("<html><head><title>Test</title></head><body><p>Succeed</p><p>HeHe</p></body></html>");
 	response.setBody(str);
 }
 

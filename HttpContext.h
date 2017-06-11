@@ -16,7 +16,7 @@ namespace ChatRoom
 			kCompleted
 		};
 		HttpContext() :state_(kExpectedRequestLine) {}
-		bool getAll() const { state_ == kCompleted; }
+		bool getAll() const { return state_ == kCompleted; }
 		HttpRequest& getRequest() { return request_; }
 		const HttpRequest& getRequest() const{ return request_; }
 		void parseRequest(Buffer *buff);

@@ -107,8 +107,6 @@ namespace ChatRoom
 			std::string result;
 			switch (statusCode_)
 			{
-			case ChatRoom::HttpResponse::kUnKnown:
-				result = "500";  break;
 			case ChatRoom::HttpResponse::k200Succeed:
 				result = "200";  break;
 			case ChatRoom::HttpResponse::k400Failed:
@@ -120,7 +118,6 @@ namespace ChatRoom
 			}
 			return result;
 		}
-
 	};
 }
 #endif // ! ChatRoom_HttpResponse_H

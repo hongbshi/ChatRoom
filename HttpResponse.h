@@ -27,7 +27,7 @@ namespace ChatRoom
 			setHttpVersion(str);
 		}
 
-		void setHttpVersion(const std::string& str) {
+		void setHttpVersion(const std::string & str) {
 			if (str == "HTTP/1.0") {
 				httpVersion_ = HttpVersion::kHttp10;
 			}

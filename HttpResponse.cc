@@ -27,7 +27,7 @@ void ChatRoom::HttpResponse::appendToBuffer(Buffer & buff)
 
 void ChatRoom::HttpResponse::appendFileToBuffer(Buffer& buff)
 {
-	int Errno = 0;
+	int Errno;
 	if (!filePath_.empty()) {
 		buff.readFromFile(filePath_.c_str(), &Errno);
 		//if(Errno)

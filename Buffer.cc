@@ -39,7 +39,7 @@ int Buffer::writeToBuffer(Buffer& src)
 	return result;
 }
 
-const char * ChatRoom::Buffer::readCRLF()
+const char * ChatRoom::Buffer::readCRLF() const
 {
 	const char* start = getBegin();
 	const char* end = getEnd();
@@ -119,7 +119,7 @@ ssize_t ChatRoom::Buffer::readSocket(int sockfd,int* Errno)
 
 ssize_t ChatRoom::Buffer::writeSocket(int sockfd, int * Errno)
 {
-	ssize_t result=writeToSocket(sockfd, 
+	ssize_t result = writeToSocket(sockfd, 
 		&store_[readIndex_], 
 		readable());
 	if (result < 0) *Errno = errno;
@@ -187,7 +187,7 @@ std::string Buffer::getString() const
 	return std::string(&store_[readIndex_], &store_[writeIndex_]);
 }
 
-std::string ChatRoom::Buffer::getStringLen(int& len) const
+std::string ChatRoom::Buffer::getStringLen(int & len) const
 {
 	if (len < 1)
 	{

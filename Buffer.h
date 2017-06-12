@@ -12,9 +12,7 @@ namespace ChatRoom
 		//Construct
 		Buffer() :readIndex_(0),
 			writeIndex_(0),
-			store_(std::vector<char>(256)) {
-			store_.clear();
-		}
+			store_(std::vector<char>(256)) {}
 		//Clear the dst
 		int readFromBuffer(std::string & src);
 		int readFromBuffer(char *dst,int len);
@@ -22,7 +20,7 @@ namespace ChatRoom
 		int writeToBuffer(const std::string& src);
 		int writeToBuffer(Buffer& src); //src will be cleared
 		//
-		const char* readCRLF();
+		const char* readCRLF () const;
 		std::string readUntilCRLF(const char *ptr);
 		void retrival(const char* str) {
 			const char* start = getBegin();
@@ -39,7 +37,7 @@ namespace ChatRoom
 		int readable() const { return writeIndex_ - readIndex_; }
 		int writable() const { return store_.capacity() - writeIndex_ - 1; }
 		void clear() { readIndex_ = writeIndex_ = 0; }
-		bool isEmpty() { return readIndex_ == writeIndex_;}
+		bool isEmpty() const { return readIndex_ == writeIndex_;}
 
 		const char* getBegin() const {
 			return static_cast<const char*>(&store_[readIndex_]);
@@ -49,7 +47,7 @@ namespace ChatRoom
 		}
 	private:
 		void adjustStore();
-		int writeToBuffer(const char* src, int len);
+		int writeToBuffer(const char *src, int len);
 		int readIndex_;
 		int writeIndex_;
 		std::vector<char> store_;

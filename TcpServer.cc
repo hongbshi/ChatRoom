@@ -42,6 +42,7 @@ void ChatRoom::TcpServer::removeConnection(TcpConnectionPtr ptr)
 
 void ChatRoom::TcpServer::removeConnectionInLoop(TcpConnectionPtr ptr)
 {
+	printf("removeConnectionInLoop, File: TcpServer.cc, removeConnectionInLoop function.\n");
 	conn_.erase(ptr->getName());
 	EventLoop* ioloop = ptr->getLoop();
 	ioloop->runInLoop(std::bind(&TcpConnection::connectDestroyed, ptr));

@@ -51,6 +51,7 @@ void ChatRoom::TcpConnection::connectEstablished()
 // Must in TcpConnection loop
 void ChatRoom::TcpConnection::connectDestroyed()
 {
+	printf("connectDestroyed, File: TcpConnection.cc, connectDestroyed function.\n");
 	if (sockState_ == kConnected)
 	{
 		channel_->disableAll();
@@ -154,12 +155,13 @@ void ChatRoom::TcpConnection::handleError()
 
 void ChatRoom::TcpConnection::handleClose()
 {
+	printf("TcpConnection handleclose, File: TcpConnection.cc, handleclose function.\n");
 	assert(sockState_ == kConnected || sockState_ == kDisconnecting);
 	setStates(kDisconnected);
 	channel_->disableAll();
 	TcpConnectionPtr guard(shared_from_this());
-	if (connectedCallback_)
-		connectedCallback_(guard);
+	//if (connectedCallback_)
+	//	connectedCallback_(guard);
 	if (closeCallback_)
 		closeCallback_(guard);
 }

@@ -36,12 +36,13 @@ namespace ChatRoom
 		void stopInloop();
 
 		enum States{kDisconnected, kConnecting, kConnected};
+		
 		EventLoop *loop_;
 		struct sockaddr_in serverAddr_;
 		NewConnCb connCb_;
 		std::mutex mu_;
 		States state_;
-		Channel * ch_;
+		Channel * ch_;  //For try aganist when we fail at first ? 
 	};
 }
 #endif // ! ChatRoom_Connector_H

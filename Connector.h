@@ -27,7 +27,7 @@ namespace ChatRoom
 		void stop();
 
 		bool isConn(){ 
-			std::lock_guard lck(mu_);
+			std::lock_guard guard(mu_);
 			return state_ == kConnected;
 		}
 
@@ -35,14 +35,22 @@ namespace ChatRoom
 		void startInloop();
 		void stopInloop();
 
-		enum States{kDisconnected, kConnecting, kConnected};
+		void setState(States s){
+			std::lock_guard guard(mu_);
+			state_ = s;
+		}
+
+		void resetChannel();
+		void handleWrite();
+
+		enum States{kDisconnected, kDisConnecting, kConnecting, kConnected};
 		
 		EventLoop *loop_;
 		struct sockaddr_in serverAddr_;
-		NewConnCb connCb_;
+		ConnCb connCb_;
 		std::mutex mu_;
 		States state_;
-		Channel * ch_;  //For try aganist when we fail at first ? 
+		shared_ptr<Channel> ch_;  //
 	};
 }
 #endif // ! ChatRoom_Connector_H

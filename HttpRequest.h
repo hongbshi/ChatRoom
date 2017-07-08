@@ -5,6 +5,7 @@
 namespace ChatRoom
 {
 	using std::string;
+	class Buffer;
 	class HttpRequest {
 	public:
 		enum HttpMethod {
@@ -155,6 +156,8 @@ namespace ChatRoom
 			headers_.swap(rhs.headers_);
 			body_.swap(rhs.body_);
 		}
+
+		void appendToBuff(Buffer& buff);
 
 	private:
 		HttpMethod method_;

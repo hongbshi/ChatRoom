@@ -7,6 +7,7 @@
 #include <sys/uio.h>
 #include <utility>
 #include <mutex>
+#include <memory>
 
 namespace ChatRoom
 {
@@ -16,6 +17,13 @@ namespace ChatRoom
 	{
 	public:
 		typedef std::function<void(int)> ConnCb;
+
+		enum States {
+			kDisConnected, 
+			kDisConnecting, 
+			kConnecting, 
+			kConnected
+		};
 
 		Connector(EventLoop *loop, const struct sockaddr_in & server);
 		~Connector();
@@ -27,7 +35,7 @@ namespace ChatRoom
 		void stop();
 
 		bool isConn(){ 
-			std::lock_guard guard(mu_);
+			std::lock_guard<std::mutex> guard(mu_);
 			return state_ == kConnected;
 		}
 
@@ -36,21 +44,19 @@ namespace ChatRoom
 		void stopInloop();
 
 		void setState(States s){
-			std::lock_guard guard(mu_);
+			std::lock_guard<std::mutex> guard(mu_);
 			state_ = s;
 		}
 
-		void resetChannel();
+		int resetChannel();
 		void handleWrite();
-
-		enum States{kDisconnected, kDisConnecting, kConnecting, kConnected};
 		
 		EventLoop *loop_;
 		struct sockaddr_in serverAddr_;
 		ConnCb connCb_;
 		std::mutex mu_;
 		States state_;
-		shared_ptr<Channel> ch_;  //
+		Channel *ch_;  //
 	};
 }
 #endif // ! ChatRoom_Connector_H

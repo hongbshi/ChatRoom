@@ -2,6 +2,8 @@
 #include "Socket.h"
 #include "EventLoop.h"
 #include "Channel.h"
+
+#include <cassert>
 using namespace ChatRoom;
 
 Connector::Connector(EventLoop *loop, const struct sockaddr_in & server):loop_(loop),serverAddr_(server){
@@ -15,58 +17,59 @@ Connector:: ~Connector(){
 }
 
 void Connector::start(){
-	loop_->runInLoop(&Connector::startInloop,this);
+	loop_->runInLoop(std::bind(&Connector::startInloop,this));
 }
 
 void Connector::stop(){
-	loop_->runInLoop(&Connector::stopInloop,this);
+	loop_->runInLoop(std::bind(&Connector::stopInloop,this));
 }
 
 void Connector::startInloop(){
 	{
-		std::lock_gurad guard(mu_);
-		if(state_ != kDisconnected) return;
+		std::lock_guard<std::mutex> guard(mu_);
+		if(state_ != kDisConnected) return;
 		state_ = kConnecting;
 	}
 	int sockfd = createNonblockSocket(AF_INET,SOCK_STREAM,IPPROTO_TCP);
-	int result = connectAddress(sockfd, *addr, length);
+	int result = connectAddress(sockfd, sockaddr_cast(&serverAddr_), sizeof serverAddr_);
 	if(result < 0){
 		//Connect Failed
 		//Tye again or not should depending on the error.
 		closeSocket(sockfd);
-		std::lock_gurad guard(mu_);
-		state_ = kDisconnected;
-		loop_->runInLoop(&Connector::startInloop,this); //Try again, add timer will be better
+		std::lock_guard<std::mutex> guard(mu_);
+		state_ = kDisConnected;
+		loop_->runInLoop(std::bind(&Connector::startInloop,this)); //Try again, add timer will be better
 	}
 	else{
-		ch_ = make_shared(Channel(sockfd));
-		ch_->setWriteCallback(&Connector::handleWrite,this);
+		ch_ = new Channel(sockfd);
+		ch_->setWriteCallback(std::bind(&Connector::handleWrite,this));
 		loop_->updateChannle(ch_);
 	}
 }
 
 void Connector::stopInloop(){
 	{
-		std::lock_gurad guard(mu_);
+		std::lock_guard<std::mutex> guard(mu_);
 		if(state_ != kConnected) return;
-		state_ = kDisconnecting;
+		state_ = kDisConnecting;
 	}
 	int sockfd = resetChannel();
 	closeSocket(sockfd);
-	setState(States(kDisconnected));
+	setState(States(kDisConnected));
 }
 
 int Connector::resetChannel(){
-	int sockfd = ch_.getfd();
-	ch_.disableAll();
-	loop_.removeChannle(ch_);
+	int sockfd = ch_->getfd();
+	ch_->disableAll();
+	loop_->removeChannle(ch_);
+	delete ch_;
 	ch_ = nullptr;
 	return sockfd;
 }
 
 void Connector::handleWrite(){
 	int sockfd = resetChannel();
-	assert(state_ == kDisconnecting);
+	assert(state_ == kDisConnecting);
 	setState(States(kConnected));
 	if(connCb_) connCb_(sockfd);
 }

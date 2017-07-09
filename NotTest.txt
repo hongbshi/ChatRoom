@@ -9,3 +9,6 @@ sudo apt-get install oracle-java8-set-default
 Install tomcate:
 http://www.open-open.com/lib/view/open1455011606261.html
 
+/usr/lib/tomcat8/bin/startup.sh
+/usr/lib/tomcat8/bin/shutdown.sh
+

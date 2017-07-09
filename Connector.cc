@@ -4,6 +4,13 @@
 #include "Channel.h"
 
 #include <cassert>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <sys/uio.h>
+#include <arpa/inet.h>
+#include <error.h>
+
 using namespace ChatRoom;
 
 Connector::Connector(EventLoop *loop, const struct sockaddr_in & server):loop_(loop),serverAddr_(server){
@@ -25,14 +32,27 @@ void Connector::stop(){
 }
 
 void Connector::startInloop(){
+	printf("File: Connector.cc, startInloop function.\n");
 	{
+		printf("File: Connector.cc, startInloop function, update Connect state.\n");
 		std::lock_guard<std::mutex> guard(mu_);
 		if(state_ != kDisConnected) return;
 		state_ = kConnecting;
 	}
 	int sockfd = createNonblockSocket(AF_INET,SOCK_STREAM,IPPROTO_TCP);
-	int result = connectAddress(sockfd, sockaddr_cast(&serverAddr_), sizeof serverAddr_);
-	if(result < 0){
+	printf("File: Connector.cc, startInloop funtion, Connect sockfd is %d\n", sockfd);
+	sockaddr *addr = sockaddr_cast(&serverAddr_);
+	short port = ntohs(serverAddr_.sin_port);
+	char ip[64];
+	inet_ntop(AF_INET,(void*)(&serverAddr_.sin_addr),ip,sizeof ip);
+	printf("File: Connector.cc, startInloop funtion, serverAddr_.sin_addr %s\n", ip);
+	printf("File: Connector.cc, startInloop funtion, serverAddr_.sin_port %d\n", port);
+	int len = sizeof serverAddr_;
+	printf("File: Connector.cc, startInloop funtion, serverAddr_ length is %d\n", len);
+	int result = connectAddress(sockfd, addr, len);
+
+	if(result < 0 && errno != EINPROGRESS){
+		printf("File: Connector.cc, startInloop function, Connect Failed, errno is %d.\n", errno);
 		//Connect Failed
 		//Tye again or not should depending on the error.
 		closeSocket(sockfd);
@@ -41,8 +61,10 @@ void Connector::startInloop(){
 		loop_->runInLoop(std::bind(&Connector::startInloop,this)); //Try again, add timer will be better
 	}
 	else{
+		printf("File: Connector.cc, startInloop function, Connect Succeed.\n");
 		ch_ = new Channel(sockfd);
 		ch_->setWriteCallback(std::bind(&Connector::handleWrite,this));
+		ch_->enableWrite();
 		loop_->updateChannle(ch_);
 	}
 }
@@ -69,7 +91,7 @@ int Connector::resetChannel(){
 
 void Connector::handleWrite(){
 	int sockfd = resetChannel();
-	assert(state_ == kDisConnecting);
+	assert(state_ == kConnecting);
 	setState(States(kConnected));
 	if(connCb_) connCb_(sockfd);
 }

@@ -43,7 +43,7 @@ void newConnCb(TcpConnectionPtr ptr){
 }
 
 void closeCb(TcpConnectionPtr ptr){
-	printf("File: HttpClientTest, newConnCb function.\n");
+	printf("File: HttpClientTest, closeCb function.\n");
 }
 
 void writeCb(TcpConnectionPtr ptr){
@@ -57,10 +57,26 @@ void messageCb(TcpConnectionPtr ptr, Buffer * buff){
 }
 
 void connCb(int sockfd){
+	//
 	printf("File: HttpClientTest, connector connCb function.\n");
 	std::string name{"client TcpConnection"}; 
 	struct sockaddr localAddr = getLocalAddr(sockfd);
 	struct sockaddr peerAddr = getPeerAddr(sockfd);
+	//Test address
+	//local address
+	struct sockaddr_in* lc = (sockaddr_in*)(&localAddr);
+	unsigned short port = ntohs(lc->sin_port);
+	char ip[64];
+	inet_ntop(AF_INET,(void*)(&lc->sin_addr),ip,sizeof ip);
+	printf("File: Connector.cc, startInloop funtion, localAddr.sin_addr %s\n", ip);
+	printf("File: Connector.cc, startInloop funtion, localAddr.sin_port %d\n", port);
+	//peer address
+	lc = (sockaddr_in*)(&peerAddr);
+	port = ntohs(lc->sin_port);
+	inet_ntop(AF_INET,(void*)(&lc->sin_addr),ip,sizeof ip);
+	printf("File: Connector.cc, startInloop funtion, peerAddr.sin_addr %s\n", ip);
+	printf("File: Connector.cc, startInloop funtion, peerAddr.sin_port %d\n", port);
+	//End Test address
 	TcpConnectionPtr ptr = make_shared<TcpConnection> (mainLoop,sockfd,
 		sockaddr_in_cast(&localAddr),sockaddr_in_cast(&peerAddr),name);
 	ptr->setConnectedCallback(std::bind(&newConnCb, _1));
@@ -89,7 +105,7 @@ int main(int argc,char *argv[]){
  	Connector connector(&loop,serverAddr);
  	connector.setConnectionCallback(connCb);
  	connector.start();
+ 	printf("File: Main function connector start end\n");
  	loop.loop();
  	return 0;
 }
-

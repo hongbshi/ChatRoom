@@ -54,22 +54,22 @@ namespace ChatRoom
 			switch (method_)
 			{
 			case kGet: 
-				result = "kGet"; break;
+				result = "GET"; break;
 			case kPost:
-				result = "kPost"; break;
+				result = "POST"; break;
 			case kHead:
-				result = "kHead"; break;
+				result = "HEAD"; break;
 			case kPut:
-				result = "kPut"; break;
+				result = "PUT"; break;
 			case kDelete:
-				result = "kDelete"; break;
+				result = "DELETE"; break;
 			default:
-				result = "kInvalid"; break;
+				result = "INVALID"; break;
 			}
 			return result;
 		}
 
-		void setUrl(const string& url) {
+		void setUrl(const string & url) {
 			url_ = url;
 		}
 

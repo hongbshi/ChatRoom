@@ -47,7 +47,7 @@ void ChatRoom::TcpConnection::connectEstablished()
 	loop_->updateChannle(&*channel_);
 	if (connectedCallback_) connectedCallback_(shared_from_this());
 	printf("File: TcpConnection.cc, TcpConnection::connectEstablished function end.\n");
-}
+}s
 // Must in TcpConnection loop
 void ChatRoom::TcpConnection::connectDestroyed()
 {
@@ -168,7 +168,6 @@ void ChatRoom::TcpConnection::handleClose()
 
 void ChatRoom::TcpConnection::sendInLoop(std::string & s)
 {
-	printf("File: TcpConnection.cc, enter sendInLoop function\n");
 	if (sockState_ == kDisconnecting || sockState_ == kDisconnected) return;
 	inputBuffer_.writeToBuffer(s);  //try send one time
 	std::string str = inputBuffer_.getString();
@@ -180,7 +179,6 @@ void ChatRoom::TcpConnection::sendInLoop(std::string & s)
 	if(result < 0) printf("TcpConnection send error! File: TcpConnection.cc, sendInLoop function.\n");
 	str = inputBuffer_.getString();
 	printf("Input buffer is:\n%s", str.c_str());
-	printf("File: TcpConnection.cc, leave sendInLoop function\n");
 }
 
 void ChatRoom::TcpConnection::shutdownWriteInLoop()

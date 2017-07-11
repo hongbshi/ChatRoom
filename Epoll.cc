@@ -15,7 +15,8 @@ void Epoll::poll(int timeout,std::vector<Channel*>& activeChannel)
 {
 	int size = event_.size();
 	int number = epoll_wait(epollfd_, &*event_.begin(), size, timeout);
-	printf("Epoll event size is %d. File: Epoll.cc, Epoll::poll function.\n", number);
+	printf("File: Epoll.cc, poll function, Current listen fd size is %d\n", activeChannel_.size());
+	printf("File: Epoll.cc, poll function. Epoll event size is %d.\n", number);
 	if (number > 0) 
 	{
 		fillActiveChannel(number, activeChannel);
@@ -32,6 +33,7 @@ void Epoll::updateChannel(Channel* ch)
 		 if (status == kNew)
 			 activeChannel_[fd] = ch;
 		 ch->setStatus(kAdded);
+		 printf("File: Epoll.cc, updateChannel function, Add listen fd %d.\n",ch->getfd());
 		 update(EPOLL_CTL_ADD, ch);
 			
 	 }
@@ -39,11 +41,14 @@ void Epoll::updateChannel(Channel* ch)
 	 {
 		 if (ch->isNoneEvent())
 		 {
+			 printf("File: Epoll.cc, updateChannel function, Delete listen fd %d.\n",ch->getfd());
 			 update(EPOLL_CTL_DEL, ch);
 			 ch->setStatus(kDeleted);
 		 }
-		 else
-			update(EPOLL_CTL_MOD, ch);
+		 else{
+			 printf("File: Epoll.cc, updateChannel function, Modify  listen fd %d.\n",ch->getfd());
+			 update(EPOLL_CTL_MOD, ch);
+		 }
 	 }
 }
 
@@ -83,5 +88,5 @@ void Epoll::fillActiveChannel(int number, std::vector<Channel*>& activeChannel)
 		tmp->setReEvent(event_[i].events);
 		activeChannel.push_back(tmp);
 	}
-	printf("fillActiveChannel successful! File: Epoll.cc, Epoll::fillActiveChannel function.\n");
+	printf("File: Epoll.cc, Epoll::fillActiveChannel function end.\n");
 }

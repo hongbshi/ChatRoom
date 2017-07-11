@@ -58,7 +58,7 @@ void messageCb(TcpConnectionPtr ptr, Buffer * buff){
 
 void connCb(int sockfd){
 	//
-	printf("File: HttpClientTest, connector connCb function.\n");
+	printf("File: HttpClientTest, connCb function start.\n");
 	std::string name{"client TcpConnection"}; 
 	struct sockaddr localAddr = getLocalAddr(sockfd);
 	struct sockaddr peerAddr = getPeerAddr(sockfd);
@@ -68,14 +68,14 @@ void connCb(int sockfd){
 	unsigned short port = ntohs(lc->sin_port);
 	char ip[64];
 	inet_ntop(AF_INET,(void*)(&lc->sin_addr),ip,sizeof ip);
-	printf("File: Connector.cc, startInloop funtion, localAddr.sin_addr %s\n", ip);
-	printf("File: Connector.cc, startInloop funtion, localAddr.sin_port %d\n", port);
+	printf("File: HttpClientTest, connCb function, localAddr.sin_addr %s\n", ip);
+	printf("File: HttpClientTest, connCb function, localAddr.sin_port %d\n", port);
 	//peer address
 	lc = (sockaddr_in*)(&peerAddr);
 	port = ntohs(lc->sin_port);
 	inet_ntop(AF_INET,(void*)(&lc->sin_addr),ip,sizeof ip);
-	printf("File: Connector.cc, startInloop funtion, peerAddr.sin_addr %s\n", ip);
-	printf("File: Connector.cc, startInloop funtion, peerAddr.sin_port %d\n", port);
+	printf("File: HttpClientTest, connCb function, peerAddr.sin_addr %s\n", ip);
+	printf("File: HttpClientTest, connCb function, peerAddr.sin_port %d\n", port);
 	//End Test address
 	TcpConnectionPtr ptr = make_shared<TcpConnection> (mainLoop,sockfd,
 		sockaddr_in_cast(&localAddr),sockaddr_in_cast(&peerAddr),name);
@@ -85,12 +85,13 @@ void connCb(int sockfd){
 	ptr->setMessageCallback(std::bind(&messageCb, _1, _2));
 	mainLoop->runInLoop(std::bind(&TcpConnection::connectEstablished,ptr));
 	ptr->startRead();
+	printf("File: HttpClientTest, connCb function end.");
 }
 
 int main(int argc,char *argv[]){
-	for(int i = 0;i < argc; ++i) cout << argv[i] <<endl;
+	//for(int i = 0;i < argc; ++i) cout << argv[i] <<endl;
 	if(argc != 3) {
-		printf("%s\n", "<Ip> <Port>"); 
+		printf("%s\n", "<Server Ip> <Server Port>"); 
 		return -1;
 	}
 	//Initial server address
@@ -100,14 +101,14 @@ int main(int argc,char *argv[]){
   	serverAddr.sin_family = AF_INET;
   	serverAddr.sin_port = htons(port);
  	int result = inet_pton(AF_INET, argv[1], &serverAddr.sin_addr);
- 	if(result < 1) printf("Main function error! ip or port wrong.\n");
+ 	if(result < 1) printf("Server Ip or Server Port is wrong.\n");
  	//Initial variable
  	EventLoop loop;
  	mainLoop = &loop;
  	Connector connector(&loop,serverAddr);
  	connector.setConnectionCallback(connCb);
  	connector.start();
- 	printf("File: Main function connector start end\n");
+ 	printf("File: HttpClientTest, main function, Main Thread Loop Start.\n");
  	loop.loop();
  	return 0;
 }

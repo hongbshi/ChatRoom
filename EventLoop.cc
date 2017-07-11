@@ -22,7 +22,7 @@ EventLoop::EventLoop()
 	quit_ = false;
 	callingPendingFunctors_ = false;
 	wakeupfd_ = eventfd(0, EFD_NONBLOCK|EFD_CLOEXEC);
-	wakeupChannel_=std::make_shared<Channel>(wakeupfd_);
+	wakeupChannel_ = std::make_shared<Channel>(wakeupfd_);
 	wakeupChannel_->enableRead();
 	epoll_ = std::make_shared<Epoll>();
 	epoll_->updateChannel(&*wakeupChannel_);
@@ -39,8 +39,9 @@ void ChatRoom::EventLoop::loop()
 	{
 		activeChannel_.clear();
 		epoll_->poll(kEpollTimeoutMs_, activeChannel_);
-		printf("Current Thread is %d, activeChannel is %d. File: EventLoop.cc, EventLoop::loop function.\n", 
-			getCurrentThreadTid(),activeChannel_.size());
+		printf("File: EventLoop.cc, EventLoop::loop function, Current Thread is %d.\n", 
+			getCurrentThreadTid());
+		printf("File: EventLoop.cc, loop function, handle event.\n");
 		for (int i = 0; i < activeChannel_.size(); i++)
 		{
 			activeChannel_[i]->handleEvent();
@@ -95,6 +96,7 @@ void ChatRoom::EventLoop::queueInLoop(const Functor& fun)
 
 void ChatRoom::EventLoop::doPendingFunctors()
 {
+	printf("File: EventLoop.cc, doPendingFunctors funtion start.")
 	callingPendingFunctors_ = true;
 	std::vector<Functor>  tmp;
 	{

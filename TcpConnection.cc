@@ -40,7 +40,7 @@ ChatRoom::TcpConnection::~TcpConnection()
 // Must in TcpConnection loop
 void ChatRoom::TcpConnection::connectEstablished()
 {
-	printf("TcpConnection connectEstablished. File: TcpConnection.cc, TcpConnection::connectEstablished function.\n");
+	printf("File: TcpConnection.cc, TcpConnection::connectEstablished function start.\n");
 	assert(sockState_ == kConnecting);
 	setStates(kConnected);
 	channel_->enableRead();
@@ -51,12 +51,13 @@ void ChatRoom::TcpConnection::connectEstablished()
 // Must in TcpConnection loop
 void ChatRoom::TcpConnection::connectDestroyed()
 {
-	printf("connectDestroyed, File: TcpConnection.cc, connectDestroyed function.\n");
+	printf("File: TcpConnection.cc, connectDestroyed function start.\n");
 	if (sockState_ == kConnected)
 	{
 		channel_->disableAll();
 	}
 	loop_->removeChannle(&*channel_);
+	printf("File: TcpConnection.cc, connectDestroyed function end.\n");
 }
 
 void ChatRoom::TcpConnection::startRead()

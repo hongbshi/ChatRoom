@@ -61,8 +61,8 @@ namespace ChatRoom
 
 		void enableAll()
 		{
-			Event_ &= kReadEvent;
-			Event_ &= kWriteEvent;
+			Event_ |= kReadEvent;
+			Event_ |= kWriteEvent;
 		}
 
 		bool isRead()
@@ -77,7 +77,7 @@ namespace ChatRoom
 
 		bool isNoneEvent()
 		{
-			return Event_ & (~kNoneEvent);
+			return !(Event_ & (~kNoneEvent));
 		}
 
 		int getfd()

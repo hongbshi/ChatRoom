@@ -96,7 +96,7 @@ void ChatRoom::EventLoop::queueInLoop(const Functor& fun)
 
 void ChatRoom::EventLoop::doPendingFunctors()
 {
-	printf("File: EventLoop.cc, doPendingFunctors funtion start.")
+	printf("File: EventLoop.cc, doPendingFunctors funtion start.\n");
 	callingPendingFunctors_ = true;
 	std::vector<Functor>  tmp;
 	{

@@ -15,7 +15,7 @@ void Epoll::poll(int timeout,std::vector<Channel*>& activeChannel)
 {
 	int size = event_.size();
 	int number = epoll_wait(epollfd_, &*event_.begin(), size, timeout);
-	printf("File: Epoll.cc, poll function, Current listen fd size is %d\n", activeChannel_.size());
+	printf("File: Epoll.cc, poll function, Current listen fd size is %d\n",(int)activeChannel_.size());
 	printf("File: Epoll.cc, poll function. Epoll event size is %d.\n", number);
 	if (number > 0) 
 	{
@@ -28,7 +28,7 @@ void Epoll::updateChannel(Channel* ch)
 {
 	 int status = ch->getStatus();
 	 int fd = ch->getfd();
-	 if (status==kNew || status==kDeleted)
+	 if (status == kNew || status == kDeleted)
 	 {
 		 if (status == kNew)
 			 activeChannel_[fd] = ch;
@@ -54,11 +54,15 @@ void Epoll::updateChannel(Channel* ch)
 
 void Epoll::removeChannel(Channel* ch)
 {
+	 printf("File: Epoll.cc, removeChannel function start.\n");
 	 int status = ch->getStatus();
 	 int fd = ch->getfd();
-	 assert(status == kAdded || status==kDeleted);
-	 if (status == kAdded)
+	 assert(status == kAdded || status == kDeleted);
+	 if (status == kAdded){
+		 printf("File: Epoll,cc, removeChannel function, Delete listen fd is %d. \n",fd);
 		 update(EPOLL_CTL_DEL, ch);
+		 //ch->setStatus(kDeleted);
+	 }
 	 auto it = activeChannel_.find(fd);
 	 activeChannel_.erase(it);
 	 ch->setStatus(kNew);
@@ -75,8 +79,11 @@ void Epoll::update(int operation,Channel* ch)
 	memset(&event, 0, sizeof(event));
 	event.events = ch->getEvent();
 	event.data.ptr = ch;
-	if (epoll_ctl(epollfd_, operation, ch->getfd(), &event) < 0)
+	printf("File: Epoll.cc, update function, events is %u.\n",event.events);
+	if (epoll_ctl(epollfd_, operation, ch->getfd(), &event) < 0){
+		printf("File: Epoll.cc, update function, epoll_ctl error.\n");
 		abort();
+	}
 }
 
 void Epoll::fillActiveChannel(int number, std::vector<Channel*>& activeChannel)

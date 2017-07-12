@@ -81,6 +81,7 @@ void Connector::stopInloop(){
 }
 
 int Connector::resetChannel(){
+	printf("File: Connector.cc, resetChannel function.\n");
 	int sockfd = ch_->getfd();
 	ch_->disableAll();
 	loop_->removeChannle(ch_);
@@ -90,6 +91,7 @@ int Connector::resetChannel(){
 }
 
 void Connector::handleWrite(){
+	printf("File: Connector.cc, handleWrite function start.\n");
 	int sockfd = resetChannel();
 	assert(state_ == kConnecting);
 	setState(States(kConnected));

@@ -38,8 +38,9 @@ void newConnCb(TcpConnectionPtr ptr){
 	req.setUrl(string("/HttpClientTest"));
 	req.setVersion(HttpRequest::kHttp11);
 	Buffer buff;
-	req.appendToBuff(buff);
-	ptr->send(buff);
+	//req.appendToBuff(buff);
+	//ptr->send(buff);
+	printf("File: HttpClientTest, newConnCb function end.\n");
 }
 
 void closeCb(TcpConnectionPtr ptr){
@@ -85,7 +86,7 @@ void connCb(int sockfd){
 	ptr->setMessageCallback(std::bind(&messageCb, _1, _2));
 	mainLoop->runInLoop(std::bind(&TcpConnection::connectEstablished,ptr));
 	ptr->startRead();
-	printf("File: HttpClientTest, connCb function end.");
+	printf("File: HttpClientTest, connCb function end.\n");
 }
 
 int main(int argc,char *argv[]){

@@ -173,7 +173,7 @@ void ChatRoom::TcpConnection::sendInLoop(std::string & s)
 	if (sockState_ == kDisconnecting || sockState_ == kDisconnected) return;
 	inputBuffer_.writeToBuffer(s);  //try send one time
 	std::string str = inputBuffer_.getString();
-	printf("Input buffer is:\n%s", str.c_str());
+	printf("Input buffer is:\n%s,%d", str.c_str(),str.size());
 	channel_->enableWrite();
 	loop_->updateChannle(&*channel_);
 	int Errno;
@@ -181,6 +181,11 @@ void ChatRoom::TcpConnection::sendInLoop(std::string & s)
 	if(result < 0) printf("TcpConnection send error! File: TcpConnection.cc, sendInLoop function.\n");
 	str = inputBuffer_.getString();
 	printf("Input buffer is:\n%s", str.c_str());
+	if(inputBuffer_.isEmpty()) {
+		printf("File: TcpConnection.cc, sendInLoop function, input Buffer is empty.\n");
+		channel_->disableWrite();
+		loop_->updateChannle(&*channel_);
+	}
 	printf("File: TcpConnection.cc, leave sendInLoop function\n");
 }
 

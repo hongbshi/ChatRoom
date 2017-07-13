@@ -19,8 +19,9 @@ Connector::Connector(EventLoop *loop, const struct sockaddr_in & server):loop_(l
 }
 
 Connector:: ~Connector(){
-	int sockfd = resetChannel();
-	closeSocket(sockfd);
+	//can not close sockfd.
+	//int sockfd = resetChannel();
+	//closeSocket(sockfd);
 }
 
 void Connector::start(){
@@ -61,7 +62,7 @@ void Connector::startInloop(){
 		loop_->runInLoop(std::bind(&Connector::startInloop,this)); //Try again, add timer will be better
 	}
 	else{
-		printf("File: Connector.cc, startInloop function, Connect Succeed.\n");
+		printf("File: Connector.cc, startInloop function, Connect First step Succeed.\n");
 		ch_ = new Channel(sockfd);
 		ch_->setWriteCallback(std::bind(&Connector::handleWrite,this));
 		ch_->enableWrite();
@@ -95,8 +96,8 @@ void Connector::handleWrite(){
 	int sockfd = resetChannel();
 	assert(state_ == kConnecting);
 	setState(States(kConnected));
-	printf("File: Connector.cc, handleWrite function, connCb_ start\n");
+	//printf("File: Connector.cc, handleWrite function, connCb_ start\n");
 	if(connCb_) connCb_(sockfd);
-	printf("File: Connector.cc, handleWrite function, connCb_ end\n");
+	//printf("File: Connector.cc, handleWrite function, connCb_ end\n");
 	printf("File: Connector.cc, handleWrite function end.\n");
 }

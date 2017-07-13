@@ -10,6 +10,7 @@
 #include "Buffer.h"
 #include "Socket.h"
 #include "Thread.h"
+#include "TcpClient.h"
 #include "HttpServer.h"
 #include "EventLoop.h"
 #include "Connector.h"
@@ -21,7 +22,7 @@ using namespace std;
 using namespace ChatRoom;
 using namespace std::placeholders;
 
-typedef std::function<void(int)> ConnCb;
+//typedef std::function<void(int)> ConnCb;
 typedef std::shared_ptr<TcpConnection> TcpConnectionPtr;
 
 typedef std::function<void(TcpConnectionPtr)> ConnectedCallback;
@@ -38,8 +39,8 @@ void newConnCb(TcpConnectionPtr ptr){
 	req.setUrl(string("/HttpClientTest"));
 	req.setVersion(HttpRequest::kHttp11);
 	Buffer buff;
-	//req.appendToBuff(buff);
-	//ptr->send(buff);
+	req.appendToBuff(buff);
+	ptr->send(buff);
 	printf("File: HttpClientTest, newConnCb function end.\n");
 }
 
@@ -57,6 +58,7 @@ void messageCb(TcpConnectionPtr ptr, Buffer * buff){
 	printf("%s\n", buff->getString().c_str());
 }
 
+/*
 void connCb(int sockfd){
 	//
 	printf("File: HttpClientTest, connCb function start.\n");
@@ -88,6 +90,7 @@ void connCb(int sockfd){
 	ptr->startRead();
 	printf("File: HttpClientTest, connCb function end.\n");
 }
+*/
 
 int main(int argc,char *argv[]){
 	//for(int i = 0;i < argc; ++i) cout << argv[i] <<endl;
@@ -105,10 +108,16 @@ int main(int argc,char *argv[]){
  	if(result < 1) printf("Server Ip or Server Port is wrong.\n");
  	//Initial variable
  	EventLoop loop;
- 	mainLoop = &loop;
- 	Connector connector(&loop,serverAddr);
- 	connector.setConnectionCallback(connCb);
- 	connector.start();
+ 	//mainLoop = &loop;
+ 	//Connector connector(&loop,serverAddr);
+ 	//connector.setConnectionCallback(connCb);
+ 	//connector.start();
+	TcpClient client(&loop,serverAddr);
+	client.setNewConnectionCallback(std::bind(&newConnCb,_1));
+	client.setWriteCallback(std::bind(&writeCb,_1));
+	client.setCloseCallback(std::bind(&closeCb,_1));
+	client.setMessageCallback(std::bind(&messageCb,_1,_2));
+	client.connect();
  	printf("File: HttpClientTest, main function, Main Thread Loop Start.\n");
  	loop.loop();
  	return 0;

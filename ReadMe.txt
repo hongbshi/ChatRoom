@@ -1,4 +1,4 @@
-g++ -std=c++11 -o HttpClientTest Acceptor.cc Buffer.cc Channel.cc Condition.cc Epoll.cc EventLoop.cc MutexLock.cc MutexLockGuard.cc Socket.cc TcpConnection.cc TcpServer.cc Thread.cc ThreadPool.cc HttpContext.cc HttpResponse.cc HttpRequest.cc HttpServer.cc Connector.cc HttpClientTest.cc -lpthread
+g++ -std=c++11 -o HttpClientTest Acceptor.cc Buffer.cc Channel.cc Condition.cc Epoll.cc EventLoop.cc MutexLock.cc MutexLockGuard.cc Socket.cc TcpConnection.cc TcpServer.cc Thread.cc ThreadPool.cc HttpContext.cc HttpResponse.cc HttpRequest.cc HttpServer.cc Connector.cc TcpClient.cc HttpClientTest.cc -lpthread
 
 Install JDK:
 sudo add-apt-repository ppa:webupd8team/java

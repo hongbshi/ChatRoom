@@ -95,5 +95,8 @@ void Connector::handleWrite(){
 	int sockfd = resetChannel();
 	assert(state_ == kConnecting);
 	setState(States(kConnected));
+	printf("File: Connector.cc, handleWrite function, connCb_ start\n");
 	if(connCb_) connCb_(sockfd);
+	printf("File: Connector.cc, handleWrite function, connCb_ end\n");
+	printf("File: Connector.cc, handleWrite function end.\n");
 }

@@ -9,6 +9,7 @@
 namespace ChatRoom
 {
 	class EventLoop;
+	class Connector;
 	class TcpClient
 	{
 	public:
@@ -18,6 +19,7 @@ namespace ChatRoom
 		typedef std::function<void(TcpConnectionPtr ptr)> CloseCallback;
 
 		TcpClient(EventLoop * loop, const struct sockaddr_in & server);
+		~TcpClient();
 		
 		void setNewConnectionCallback(NewConnectionCallback & cb){ connCb_ = cb;}
 		void setNewConnectionCallback(NewConnectionCallback && cb){ connCb_ = std::move(cb);}
@@ -26,17 +28,18 @@ namespace ChatRoom
 		void setCloseCallback(CloseCallback & cb){ closeCb_ = cb;}
 		void setCloseCallback(CloseCallback && cb){ closeCb_ = std::move(cb);}
 		
-		void conn();
-		void disconn();
-		bool isconn() {return isconn_;}
+		void connect();
+		void disconnect();
+		bool isconnect() {return isconnect_;}
 
 	private:
-		void newConn()
+		void connectorCb(int sockfd);
 		EventLoop *loop_;
 		struct sockaddr_in serverAddr_;
 		struct sockaddr_in localAddr_;
-		int sockfd_;
-		bool isconn_;
+		//int sockfd_;
+		bool isconnect_;
+		std::shared<Connector> connector_;
 		TcpConnectionPtr tcpConn_;
 		NewConnectionCallback connCb_;
 		MessageCallback messCb_;

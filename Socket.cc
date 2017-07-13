@@ -57,6 +57,7 @@ int ChatRoom::acceptConnect(int sockfd,
 
 int ChatRoom::closeSocket(int sockfd)
 {
+	printf("File: Socket.cc, closeSocket function.\n");
 	return close(sockfd);
 }
 

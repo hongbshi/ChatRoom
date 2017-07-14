@@ -21,7 +21,8 @@ ChatRoom::TcpConnection::TcpConnection(EventLoop * loop,
 	name_(name),
 	sockState_(kConnecting), 
 	channel_(std::make_shared<Channel>(sockfd_)),
-	context_()
+	context_(),
+	context2_()
 {
 	connectedCallback_= nullptr;
 	closeCallback_ = nullptr;

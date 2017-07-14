@@ -6,6 +6,7 @@
 #include <netinet/in.h>
 #include <sys/uio.h>
 #include <memory>
+
 #include "Channel.h"
 #include "Buffer.h"
 #include "EventLoop.h"
@@ -92,6 +93,14 @@ namespace ChatRoom
 		std::shared_ptr<void> getContext() {
 			return context_;
 		}
+		
+		void setContext2(std::shared_ptr<void> ptr){
+			context2_ = ptr;
+		}
+
+		std::shared_ptr<void> getContext2(){
+			return context2_;
+		}
 
 	private:
 		void handleRead();
@@ -122,6 +131,7 @@ namespace ChatRoom
 		static int number;
 
 		std::shared_ptr<void> context_;
+		std::shared_ptr<void> context2_;
 	};
 }
 #endif // ! ChatRoom_TcpConnection_H

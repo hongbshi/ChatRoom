@@ -122,12 +122,11 @@ void ChatRoom::TcpConnection::handleRead()
 	int Errno;
 	//Get read result
 	int result = outputBuffer_.readSocket(sockfd_, &Errno);
-	printf("Read result is %d, File: TcpConnection.cc, TcpConnection::handleRead function.\n", result);
+	printf("File: TcpConnection.cc, TcpConnection::handleRead function, Read %d bytes.\n", result);
 	//Deal result
 	if (result > 0 && messageCallback_)
 		messageCallback_(shared_from_this(),&outputBuffer_);
-	else if (result == 0)
-		handleClose();	
+	else if (result == 0) handleClose();	
 	else
 	{
 		errno = Errno;
@@ -139,11 +138,9 @@ void ChatRoom::TcpConnection::handleWrite()
 {
 	int Errno;
 	if(inputBuffer_.isEmpty()){
+		channel_->disableWrite();
+		loop_->updateChannle(&*channel_);
 		if(writeCallback_) writeCallback_(shared_from_this());
-        //if(inputBuffer_.isEmpty()){
-		//	channel_->disableWrite();
-		//	loop_->updateChannel(&*channel_);
-		//}
 		return;
 	}
 	int result = inputBuffer_.writeSocket(sockfd_, &Errno);
@@ -157,8 +154,7 @@ void ChatRoom::TcpConnection::handleWrite()
 		if(writeCallback_)
 			writeCallback_(shared_from_this());
 	}
-	else if (result == 0)
-		handleClose();
+	else if (result == 0) handleClose();
 	else
 	{
 		errno = Errno;
@@ -174,20 +170,22 @@ void ChatRoom::TcpConnection::handleError()
 
 void ChatRoom::TcpConnection::handleClose()
 {
-	printf("TcpConnection handleclose, File: TcpConnection.cc, handleclose function.\n");
+	printf("File: TcpConnection.cc, handleclose function.\n");
 	assert(sockState_ == kConnected || sockState_ == kDisconnecting);
-	setStates(kDisconnected);
-	channel_->disableAll();
-	TcpConnectionPtr guard(shared_from_this());
-	//if (connectedCallback_)
-	//	connectedCallback_(guard);
-	if (closeCallback_)
-		closeCallback_(guard);
+	if(sockState_ == kDisconnecting){
+		setStates(kDisconnected);
+		channel_->disableAll();
+		TcpConnectionPtr guard(shared_from_this());
+		if (closeCallback_) closeCallback_(guard);
+	}
+	else{
+		sockState_ = kDisconnecting;
+	}
 }
 
 void ChatRoom::TcpConnection::sendInLoop(std::string & s)
 {
-	printf("File: TcpConnection.cc, enter sendInLoop function\n");
+	printf("File: TcpConnection.cc, sendInLoop function\n");
 	if (sockState_ == kDisconnecting || sockState_ == kDisconnected) return;
 	inputBuffer_.writeToBuffer(s);  //try send one time
 	//std::string str = inputBuffer_.getString();

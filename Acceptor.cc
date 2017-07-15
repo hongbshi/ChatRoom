@@ -16,12 +16,11 @@ ChatRoom::Acceptor::Acceptor(EventLoop * loop,
 	newConnectCallback_ (nullptr),
 	listening_ (false)
 {
-	printf("Socket fd is %d. File : Acceptor.cc, Acceptor::Acceptor function.\n", sockfd_);
+	printf("File: Acceptor.cc, Acceptor::Acceptor function, acceptor sockfd is %d.\n", sockfd_);
 	const struct sockaddr *addr = sockaddr_cast(listenAddr);
 	socklen_t len = sizeof(*addr);
-	printf("%d\n", len);
-	if(bindAddress(sockfd_, addr, len) < 0)
-		printf("BindAddress fail. File : Acceptor.cc, Acceptor::Acceptor function.\n");
+	//printf("%d\n", len);
+	if(bindAddress(sockfd_, addr, len) < 0) printf("File: Acceptor.cc, Acceptor::Acceptor function, bind address failed.\n");
 	setReuseAddr(sockfd_);
 	if (reusePort) setReusePort(sockfd_);
 	channel_.setReadCallback(std::bind(&Acceptor::handleRead, this));
@@ -44,12 +43,11 @@ bool ChatRoom::Acceptor::isListening()
 
 void ChatRoom::Acceptor::listen()
 {
-	if(listenSocket(sockfd_, SOMAXCONN) < 0)
-		printf("listenSocket Fail. File: Acceptor.cc, Acceptor::listen function.\n");
+	if(listenSocket(sockfd_, SOMAXCONN) < 0) printf("File: Acceptor.cc, Acceptor::listen function, listen socket failed.\n");
 	channel_.enableRead();
 	loop_->updateChannle(&channel_);
 	listening_ = true;
-	printf("%s\n", "Acceptor is listening! Acceptor.cc, Acceptor::listen function");
+	printf("File: Acceptor.cc, Acceptor::listen function end.\n");
 }
 
 ChatRoom::Acceptor::~Acceptor()
@@ -64,7 +62,7 @@ void ChatRoom::Acceptor::handleRead()
 {
 	struct sockaddr clientAddr;
 	int connectFd = acceptConnect(sockfd_, &clientAddr, sizeof clientAddr);
-	printf("ConnectFd is %d. File : Acceptor.cc, Acceptor::handleRead funcion.\n", connectFd);
+	printf("File: Acceptor.cc, Acceptor::handleRead funcion, new connect sockfd is %d.\n", connectFd);
 	if (connectFd >= 0)
 	{
 		if (newConnectCallback_)

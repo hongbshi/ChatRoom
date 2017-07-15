@@ -126,7 +126,7 @@ void TcpProxyServer::start()
 	threadPool_ = std::make_shared<ThreadPool>(loop_, threadInitialCallback_, threadNum_);
 	threadPool_->start();
 	acceptor_->listen();
-	printf("%s\n", "TcpProxyServer start ok! TcpProxyServer.cc, TcpProxyServer::start function");
+	printf("File: TcpProxyServer.cc, TcpProxyServer::start function end.\n");
 }
 
 void TcpProxyServer::handleNewConnection(TcpConnectionPtr ptr){

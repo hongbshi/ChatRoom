@@ -26,13 +26,13 @@ int ChatRoom::bindAddress(int sockfd,
 	const struct sockaddr * addr, 
 	socklen_t length)
 {
-	printf("Bind sockfd is %d. File: Socket.cc, ChatRoom::bindAddress function.\n", sockfd);
+	printf("File: Socket.cc, ChatRoom::bindAddress function, bind sockfd is %d.\n", sockfd);
 	const struct sockaddr_in *tmp = sockaddr_in_cast(addr);
 	int port = ntohs(tmp->sin_port);
-	printf("Bind port is %d. File: Socket.cc, ChatRoom::bindAddress function.\n", port);
+	printf("File: Socket.cc, ChatRoom::bindAddress function, bind port is %d.\n", port);
 	char ip[64];
 	inet_ntop(AF_INET,(const void*)(&(tmp->sin_addr)),ip,60);
-	printf("Bind ip is %s. File: Socket.cc, ChatRoom::bindAddress function.\n", ip);
+	printf("File: Socket.cc, ChatRoom::bindAddress function, bind ip is %s.\n", ip);
 	return bind(sockfd, addr, length);
 }
 
@@ -57,7 +57,7 @@ int ChatRoom::acceptConnect(int sockfd,
 
 int ChatRoom::closeSocket(int sockfd)
 {
-	printf("File: Socket.cc, closeSocket function.\n");
+	printf("File: Socket.cc, closeSocket function, close %d socket.\n", sockfd);
 	return close(sockfd);
 }
 

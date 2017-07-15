@@ -16,7 +16,7 @@ Channel::Channel(int fd)
 
 void Channel::handleEvent()
 {
-	printf("Channel handleEvent, File: Channel.cc, Channel::handleEvent function.\n");
+	//printf("Channel handleEvent, File: Channel.cc, Channel::handleEvent function.\n");
 	//
 	//if(reEvent_ & EPOLLIN) printf("EPOLLIN\n");
 	//if(reEvent_ & EPOLLPRI) printf("EPOLLPRI\n");
@@ -27,19 +27,19 @@ void Channel::handleEvent()
 	//
 	if (reEvent_ == kNoneEvent)	return;
 	if((reEvent_ & EPOLLIN) && (reEvent_ & EPOLLRDHUP) && closeCallback_){
-		printf("close call back, File: Channel.cc, Channel::handleEvent function.\n");
+		printf("File: Channel.cc, Channel::handleEvent function, close event.\n");
 		closeCallback_();
 	}
 	else if ((reEvent_ & (EPOLLIN | EPOLLPRI)) && readCallback_){
-		printf("read call back, File: Channel.cc, Channel::handleEvent function.\n");
+		printf("File: Channel.cc, Channel::handleEvent function, read event.\n");
 		readCallback_();
 	}
 	if ((reEvent_ & EPOLLOUT) && writeCallback_){
-		printf("write call back, File: Channel.cc, Channel::handleEvent function.\n");
+		printf("File: Channel.cc, Channel::handleEvent function, write event.\n");
 		writeCallback_();
 	}
 	if ((reEvent_ & EPOLLERR) && errorCallback_){
-		printf("error call back, File: Channel.cc, Channel::handleEvent function.\n");
+		printf("File: Channel.cc, Channel::handleEvent function, error event.\n");
 		errorCallback_();
 	}
 	/*

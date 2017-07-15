@@ -42,7 +42,7 @@ int main(int argc,char *argv[]){
  	result = inet_pton(AF_INET, argv[3], &serverAddr.sin_addr); 	
  	if(result <= 0) printf("File : HttpServerTest.cc, main funcion, listen address error.\n");
 	//
- 	printf("Current Thread is %d, File : HttpServerTest.cc, main funcion.\n", getCurrentThreadTid());
+ 	printf("File: TcpProxyServerTest.cc, main funcion, main thread id is %d.\n", getCurrentThreadTid());
 	EventLoop loop;
 	TcpProxyServer server(&loop,listenAddr,serverAddr);
 	server.start();

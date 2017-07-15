@@ -75,6 +75,8 @@ namespace ChatRoom
 		void startRead();
 		void stopRead();
 		//void forceClose();
+		void startWrite();
+		void stopWrite();
 
 		Buffer* getInputBuffer() { return &inputBuffer_; }
 		Buffer* getOutputBuffer() { return &outputBuffer_; }
@@ -112,6 +114,8 @@ namespace ChatRoom
 		void closeInLoop();
 		void startReadInLoop();
 		void stopReadInLoop();
+		void startWriteInLoop();
+		void stopWriteInLoop();
 		EventLoop* loop_;
 		int sockfd_;
 		struct sockaddr_in localAddress_;

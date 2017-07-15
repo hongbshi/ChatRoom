@@ -44,7 +44,7 @@ namespace ChatRoom
 
 		void send(Buffer *buff);
 
-		void setContext(std::shared<TcpConnection> ptr){
+		void setContext(std::shared_ptr<TcpConnection> ptr){
 			context_ = ptr;
 		}
 

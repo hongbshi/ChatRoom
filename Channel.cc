@@ -18,12 +18,12 @@ void Channel::handleEvent()
 {
 	printf("Channel handleEvent, File: Channel.cc, Channel::handleEvent function.\n");
 	//
-	if(reEvent_ & EPOLLIN) printf("EPOLLIN\n");
-	if(reEvent_ & EPOLLPRI) printf("EPOLLPRI\n");
-	if(reEvent_ & EPOLLRDHUP) printf("EPOLLRDHUP\n");
-	if(reEvent_ & EPOLLOUT) printf("EPOLLOUT\n");
-	if(reEvent_ & EPOLLERR) printf("EPOLLERR\n");
-	if(reEvent_ & EPOLLHUP) printf("EPOLLHUP\n");
+	//if(reEvent_ & EPOLLIN) printf("EPOLLIN\n");
+	//if(reEvent_ & EPOLLPRI) printf("EPOLLPRI\n");
+	//if(reEvent_ & EPOLLRDHUP) printf("EPOLLRDHUP\n");
+	//if(reEvent_ & EPOLLOUT) printf("EPOLLOUT\n");
+	//if(reEvent_ & EPOLLERR) printf("EPOLLERR\n");
+	//if(reEvent_ & EPOLLHUP) printf("EPOLLHUP\n");
 	//
 	if (reEvent_ == kNoneEvent)	return;
 	if((reEvent_ & EPOLLIN) && (reEvent_ & EPOLLRDHUP) && closeCallback_){

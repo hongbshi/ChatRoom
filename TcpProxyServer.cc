@@ -1,5 +1,6 @@
-#include "Socket.h"
 #include "TcpProxyServer.h"
+#include "Socket.h"
+#include "TcpProxyClient.h"
 #include "TcpConnection.h"
 #include "Acceptor.h"
 #include "ThreadPool.h"
@@ -16,6 +17,7 @@ void TcpProxyServer::newConnection(int sockfd, const struct sockaddr & clientAdd
 	char buff[32];
 	int number = ChatRoom::TcpConnection::getNumber();
 	snprintf(buff,sizeof buff, "%s,%d","TcpConnection", number);
+	std::string name(buff);
 	EventLoop* loop= threadPool_->getNext();
 	const struct sockaddr_in * addr = sockaddr_in_cast(&clientAddr);
 	//Create TcpConnetion
@@ -23,7 +25,7 @@ void TcpProxyServer::newConnection(int sockfd, const struct sockaddr & clientAdd
 			sockfd, 
 			&listenAddr_, 
 			addr,
-			std::string(buff));
+			name);
 	conn->setConnectedCallback(std::bind(&TcpProxyServer::handleNewConnection,this,_1));
 	conn->setMessageCallback(std::bind(&TcpProxyServer::handleMessage,this,_1,_2));
 	conn->setCloseCallback(std::bind(&TcpProxyServer::removeConnection,this,_1));
@@ -35,12 +37,12 @@ void TcpProxyServer::newConnection(int sockfd, const struct sockaddr & clientAdd
 	//client->setMessageCallback(std::bind(&TcpProxyServer::handleMessage,this,_1,_2));
 	//client->setCloseCallback(std::bind(&TcpProxyServer::handleClose,this,_1));
 	//Connect TcpConnection and TcpProxyClient
-	conn_->setContext2(std::static_pointer_cast<void>(client));
-	client->setContext(conn_);
+	conn->setContext2(std::static_pointer_cast<void>(client));
+	client->setContext(conn);
     //	
 	loop->runInLoop(std::bind(&TcpConnection::connectEstablished,conn));
 	//loop->runInLoop(std::bind(&TcpProxyClient::connect,client));
-	printf("File: TcpServer.cc, TcpServer::newConnection function end.\n");
+	printf("File: TcpProxyServer.cc, TcpProxyServer::newConnection function end.\n");
 }
 
 void TcpProxyServer::removeConnection(TcpConnectionPtr ptr)
@@ -69,8 +71,8 @@ TcpProxyServer::TcpProxyServer(EventLoop * loop,
 	threadNum_(0),
 	threadInitialCallback_()
 {
-	acceptor_ = std::make_shared<Acceptor>(loop, listenAddr, reusePort);
-	acceptor_-> setNewConnectCallback(std::bind(&TcpServer::newConnection, this, _1, _2));
+	acceptor_ = std::make_shared<Acceptor>(loop, &listenAddr, reusePort);
+	acceptor_-> setNewConnectCallback(std::bind(&TcpProxyServer::newConnection, this, _1, _2));
 	threadPool_ = nullptr;
 }
 
@@ -109,11 +111,6 @@ void TcpProxyServer::setMessageCallback(MessageCallback && cb)
 	messageCallback_ = std::move(cb);
 }
 
-//void ChatRoom::TcpServer::setWriteCompleteCallback(WriteCompleteCallback &&cb)
-//{
-//	writeCompleteCallback_ = cb;
-//}
-
 void TcpProxyServer::setCloseCallback(CloseCallback & cb)
 {
 	closeCallback_ = cb;
@@ -129,10 +126,10 @@ void TcpProxyServer::start()
 	threadPool_ = std::make_shared<ThreadPool>(loop_, threadInitialCallback_, threadNum_);
 	threadPool_->start();
 	acceptor_->listen();
-	printf("%s\n", "TcpServer start ok! TcpServer.cc, TcpServer::start function");
+	printf("%s\n", "TcpProxyServer start ok! TcpProxyServer.cc, TcpProxyServer::start function");
 }
 
-void TcpProxyServer::handleNewConnetion(TcpConnectionPtr ptr){
+void TcpProxyServer::handleNewConnection(TcpConnectionPtr ptr){
 	//
 }
 
@@ -142,9 +139,9 @@ void TcpProxyServer::handleNewConnetion(TcpConnectionPtr ptr){
 
 void TcpProxyServer::handleMessage(TcpConnectionPtr ptr,Buffer *buff){
 	std::shared_ptr<TcpProxyClient> client = std::static_pointer_cast<TcpProxyClient>(ptr->getContext2());
-	EventLoop *ioLoop = ptr->getEventLoop();
+	EventLoop *ioLoop = ptr->getLoop();
 	//if(client->isconnect()){
-	iploop->runInLoop(std::bind(&TcpProxyClient::send,client,buff));
+	ioLoop->runInLoop(std::bind(&TcpProxyClient::send,client,buff));
 	//}
 	//else{
 

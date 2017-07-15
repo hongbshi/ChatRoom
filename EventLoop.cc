@@ -39,9 +39,8 @@ void ChatRoom::EventLoop::loop()
 	{
 		activeChannel_.clear();
 		epoll_->poll(kEpollTimeoutMs_, activeChannel_);
-		printf("File: EventLoop.cc, EventLoop::loop function, Current Thread is %d.\n", 
-			getCurrentThreadTid());
-		printf("File: EventLoop.cc, loop function, handle event.\n");
+		printf("File: EventLoop.cc, EventLoop::loop function, Current Thread is %d.\n", getCurrentThreadTid());
+		//printf("File: EventLoop.cc, loop function, handle event.\n");
 		for (int i = 0; i < activeChannel_.size(); i++)
 		{
 			activeChannel_[i]->handleEvent();

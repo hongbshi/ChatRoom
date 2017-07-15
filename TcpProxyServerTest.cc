@@ -7,6 +7,8 @@
 #include <sys/uio.h>
 #include <arpa/inet.h>
 
+#include "TcpProxyClient.h"
+#include "TcpProxyServer.h"
 #include "Thread.h"
 #include "HttpServer.h"
 #include "EventLoop.h"

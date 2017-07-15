@@ -24,7 +24,7 @@ namespace ChatRoom
 		//typedef std::function<void(TcpConnectionPtr ptr)> WriteCompleteCallback();
 		typedef std::function<void(TcpConnectionPtr ptr, Buffer* buff)> MessageCallback;
 		typedef std::function<void(TcpConnectionPtr ptr)> CloseCallback;
-		TcpProxyServef(EventLoop *loop, const struct sockaddr_in & listenAddr, 
+		TcpProxyServer(EventLoop *loop, const struct sockaddr_in & listenAddr, 
 				const struct sockaddr_in & serverAddr, bool reusePort = false);
 	
 		void setThreadNum(const unsigned int num);
@@ -46,6 +46,7 @@ namespace ChatRoom
 		//For Acceptor 
 		void newConnection(int sockfd, const struct sockaddr& clientAddr);
 		//For TcpConnection
+		void handleNewConnection(TcpConnectionPtr ptr);
 		void removeConnection(TcpConnectionPtr ptr);
 		void removeConnectionInLoop(TcpConnectionPtr ptr);
 		void handleWrite(TcpConnectionPtr ptr);

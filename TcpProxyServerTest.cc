@@ -39,7 +39,7 @@ int main(int argc,char *argv[]){
 	//
   	listenAddr.sin_family = AF_INET;
   	listenAddr.sin_port = htons(port2);                           	
- 	result = inet_pton(AF_INET, argv[3], &serverAddr.sin_addr); 	
+ 	result = inet_pton(AF_INET, argv[3], &listenAddr.sin_addr); 	
  	if(result <= 0) printf("File : HttpServerTest.cc, main funcion, listen address error.\n");
 	//
  	printf("File: TcpProxyServerTest.cc, main funcion, main thread id is %d.\n", getCurrentThreadTid());

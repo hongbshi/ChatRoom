@@ -13,7 +13,8 @@ namespace ChatRoom{
 	class ServerAddr{
 		public:
 			static bool addServerAddr(const char *ip, const char *port);
-			static bool getNext(struct sockaddr_in & addr) const;
+			static void swapAddr(std::vector<struct sockaddr_in> & addr);
+			static bool getNext(struct sockaddr_in & addr);
 			//static int getNum() const;
 		private:
 			ServerAddr();

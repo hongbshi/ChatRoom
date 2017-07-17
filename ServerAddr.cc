@@ -1,8 +1,10 @@
 #include "ServerAddr.h"
+#include <cstdlib>
+#include <cstring>
 
 using namespace ChatRoom;
 
-static bool ServerAddr::addServerAddr(const char *ip, const char *port){
+bool ServerAddr::addServerAddr(const char *ip, const char *port){
 	//create new sockaddr_in
 	struct sockaddr_in tmp;
 	bzero(&tmp, sizeof(tmp));                                                              
@@ -19,11 +21,15 @@ static bool ServerAddr::addServerAddr(const char *ip, const char *port){
 	return true;
 }
 
-static bool ServerAddr::getNext(struct sockaddr_in & addr) const{
+void ServerAddr::swapAddr(std::vector<struct sockaddr_in> & addr){
+	serverAddrPool.addr_.swap(addr);
+}
+
+bool ServerAddr::getNext(struct sockaddr_in & addr){
 	if(serverAddrPool.addr_.empty()) return false;
 	++serverAddrPool.idx_;
 	serverAddrPool.idx_ %= serverAddrPool.addr_.size();
-	addr = serverAddrPool.addr_[idx_];
+	addr = serverAddrPool.addr_[serverAddrPool.idx_];
 	return true;
 }
 
@@ -35,5 +41,5 @@ ServerAddr::ServerAddr():idx_(0),addr_(){}
 
 ServerAddr::~ServerAddr(){}
 
-ServerAddr ServerAddr::addr_;
+ServerAddr ServerAddr::serverAddrPool;
 

@@ -22,15 +22,12 @@ using namespace std;
 using namespace ChatRoom;
 using namespace std::placeholders;
 
-//typedef std::function<void(int)> ConnCb;
 typedef std::shared_ptr<TcpConnection> TcpConnectionPtr;
 
 typedef std::function<void(TcpConnectionPtr)> ConnectedCallback;
 typedef std::function<void(TcpConnectionPtr)> CloseCallback;
 typedef std::function<void(TcpConnectionPtr)> WriteCallback;
 typedef std::function<void(TcpConnectionPtr, Buffer*)> MessageCallback;
-
-EventLoop *mainLoop = nullptr;
 
 void newConnCb(TcpConnectionPtr ptr){
 	printf("File: HttpClientTest, newConnCb function.\n");
@@ -58,40 +55,6 @@ void messageCb(TcpConnectionPtr ptr, Buffer * buff){
 	printf("%s\n", buff->getString().c_str());
 }
 
-/*
-void connCb(int sockfd){
-	//
-	printf("File: HttpClientTest, connCb function start.\n");
-	std::string name{"client TcpConnection"}; 
-	struct sockaddr localAddr = getLocalAddr(sockfd);
-	struct sockaddr peerAddr = getPeerAddr(sockfd);
-	//Test address
-	//local address
-	struct sockaddr_in* lc = (sockaddr_in*)(&localAddr);
-	unsigned short port = ntohs(lc->sin_port);
-	char ip[64];
-	inet_ntop(AF_INET,(void*)(&lc->sin_addr),ip,sizeof ip);
-	printf("File: HttpClientTest, connCb function, localAddr.sin_addr %s\n", ip);
-	printf("File: HttpClientTest, connCb function, localAddr.sin_port %d\n", port);
-	//peer address
-	lc = (sockaddr_in*)(&peerAddr);
-	port = ntohs(lc->sin_port);
-	inet_ntop(AF_INET,(void*)(&lc->sin_addr),ip,sizeof ip);
-	printf("File: HttpClientTest, connCb function, peerAddr.sin_addr %s\n", ip);
-	printf("File: HttpClientTest, connCb function, peerAddr.sin_port %d\n", port);
-	//End Test address
-	TcpConnectionPtr ptr = make_shared<TcpConnection> (mainLoop,sockfd,
-		sockaddr_in_cast(&localAddr),sockaddr_in_cast(&peerAddr),name);
-	ptr->setConnectedCallback(std::bind(&newConnCb, _1));
-	ptr->setCloseCallback(std::bind(&closeCb, _1));
-	ptr->setWriteCallback(std::bind(&writeCb, _1));
-	ptr->setMessageCallback(std::bind(&messageCb, _1, _2));
-	mainLoop->runInLoop(std::bind(&TcpConnection::connectEstablished,ptr));
-	ptr->startRead();
-	printf("File: HttpClientTest, connCb function end.\n");
-}
-*/
-
 int main(int argc,char *argv[]){
 	//for(int i = 0;i < argc; ++i) cout << argv[i] <<endl;
 	if(argc != 3) {
@@ -108,10 +71,6 @@ int main(int argc,char *argv[]){
  	if(result < 1) printf("Server Ip or Server Port is wrong.\n");
  	//Initial variable
  	EventLoop loop;
- 	//mainLoop = &loop;
- 	//Connector connector(&loop,serverAddr);
- 	//connector.setConnectionCallback(connCb);
- 	//connector.start();
 	TcpClient client(&loop,serverAddr);
 	client.setNewConnectionCallback(std::bind(&newConnCb,_1));
 	client.setWriteCallback(std::bind(&writeCb,_1));

@@ -38,22 +38,22 @@ namespace ChatRoom
 		~TcpConnection();
 
 		//when connect was completed,it was been called.
-		void setConnectedCallback(const ConnectedCallback& cb)
+		void setConnectedCallback(const ConnectedCallback & cb)
 		{
 			connectedCallback_ = cb;
 		}
 
-		void setCloseCallback(const CloseCallback& cb)
+		void setCloseCallback(const CloseCallback & cb)
 		{
 			closeCallback_ = cb;
 		}
 
-		void setWriteCallback(const WriteCallback& cb)
+		void setWriteCallback(const WriteCallback & cb)
 		{
 			writeCallback_ = cb;
 		}
 
-		void setMessageCallback(const MessageCallback& cb)
+		void setMessageCallback(const MessageCallback & cb)
 		{
 			messageCallback_ = cb;
 		}
@@ -71,15 +71,17 @@ namespace ChatRoom
 
 		void close();
 		void shutdownWrite();
+
 		//start the read and stop the read
 		void startRead();
 		void stopRead();
-		//void forceClose();
+
 		void startWrite();
 		void stopWrite();
 
 		Buffer* getInputBuffer() { return &inputBuffer_; }
 		Buffer* getOutputBuffer() { return &outputBuffer_; }
+
 		EventLoop* getLoop() { return loop_; }
 
 		const struct sockaddr_in& getLocalAddress() { return localAddress_; }
@@ -116,14 +118,18 @@ namespace ChatRoom
 		void stopReadInLoop();
 		void startWriteInLoop();
 		void stopWriteInLoop();
-		EventLoop* loop_;
+
+		static void defaultMessageCb(TcpConnectionPtr, Buffer*);
+
+		EventLoop *loop_;
+
 		int sockfd_;
 		struct sockaddr_in localAddress_;
 		struct sockaddr_in peerAddress_;
 		std::string name_;
-
 		sockStates sockState_;
 		std::shared_ptr<Channel> channel_;
+
 		ConnectedCallback connectedCallback_;
 		CloseCallback closeCallback_;
 		WriteCallback writeCallback_;

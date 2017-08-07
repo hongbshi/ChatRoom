@@ -3,6 +3,7 @@
 #include "Channel.h"
 #include "EventLoop.h"
 #include <stdio.h>
+#include <stdlib.h>
 #include <fcntl.h> 
 using namespace ChatRoom;
 
@@ -19,9 +20,12 @@ ChatRoom::Acceptor::Acceptor(EventLoop * loop,
 	printf("File: Acceptor.cc, Acceptor::Acceptor function, acceptor sockfd is %d.\n", sockfd_);
 	const struct sockaddr *addr = sockaddr_cast(listenAddr);
 	socklen_t len = sizeof(*addr);
-	//printf("%d\n", len);
-	if(bindAddress(sockfd_, addr, len) < 0) printf("File: Acceptor.cc, Acceptor::Acceptor function, bind address failed.\n");
-	setReuseAddr(sockfd_);
+	int res = bindAddress(sockfd_, addr, len);
+	if(res < 0){
+		printf("File: Acceptor.cc, Acceptor::Acceptor function, bind address failed.\n");
+		exit(-1);
+	}
+   	setReuseAddr(sockfd_);
 	if (reusePort) setReusePort(sockfd_);
 	channel_.setReadCallback(std::bind(&Acceptor::handleRead, this));
 }
@@ -43,7 +47,11 @@ bool ChatRoom::Acceptor::isListening()
 
 void ChatRoom::Acceptor::listen()
 {
-	if(listenSocket(sockfd_, SOMAXCONN) < 0) printf("File: Acceptor.cc, Acceptor::listen function, listen socket failed.\n");
+	int res = listenSocket(sockfd_, SOMAXCONN);
+	if(res < 0){
+		printf("File: Acceptor.cc, Acceptor::listen function, listen socket failed.\n");
+		exit(-1);
+	}
 	channel_.enableRead();
 	loop_->updateChannle(&channel_);
 	listening_ = true;

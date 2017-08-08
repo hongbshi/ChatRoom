@@ -133,15 +133,20 @@ void ChatRoom::TcpConnection::handleRead()
 
 void ChatRoom::TcpConnection::handleWrite()
 {
+	printf("File: TcpConnection.cc, TcpConnection::handleWrite function.\n");
 	if(inputBuffer_.isEmpty()){
+		printf("File: TcpConnection.cc, TcpConnection::handleWrite function, inputBuffer is empty.\n");
 		channel_->disableWrite();
 		loop_->updateChannle(&*channel_);
+		//printf("abc\n");
 		if(writeCallback_) writeCallback_(shared_from_this());
+		printf("File: TcpConnection.cc, TcpConnection::handleWrite function leave.\n");
 		return;
 	}
 	int Errno, result = inputBuffer_.writeSocket(sockfd_, &Errno);
 	if (result > 0)
 	{
+		printf("File: TcpConnection.cc, TcpConnection::handleWrite function, write %d bytes.\n", result);
 		if (inputBuffer_.readable() == 0)
 		{
 			channel_->disableWrite();
@@ -155,10 +160,12 @@ void ChatRoom::TcpConnection::handleWrite()
 		errno = Errno;
 		handleError();
 	}
+	printf("File: TcpConnection.cc, TcpConnection::handleWrite function end.\n");
 }
 
 void ChatRoom::TcpConnection::handleError()
 {
+	printf("File: TcpConnection.cc, TcpConnection::handleError function.\n");
 	//log something
 	//exit(-1);
 	//setStates(kDisconnected);

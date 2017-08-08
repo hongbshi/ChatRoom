@@ -124,7 +124,7 @@ ssize_t ChatRoom::Buffer::writeSocket(int sockfd, int * Errno)
 		&store_[readIndex_], 
 		readable());
 	if (result < 0) *Errno = errno;
-	else if (0 < result) readIndex_ += result;
+	else if (result > 0) readIndex_ += result;
 	return result;
 }
 

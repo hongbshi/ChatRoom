@@ -120,6 +120,7 @@ void ChatRoom::TcpConnection::send(Buffer & buff)
 void ChatRoom::TcpConnection::handleRead()
 {
 	//Get read result
+	//if(sockState_ == kDisconnected || sockState_ == kDisconnecting) return;
 	int Errno, result = outputBuffer_.readSocket(sockfd_, &Errno);
 	printf("File: TcpConnection.cc, TcpConnection::handleRead function, Read %d bytes.\n", result);
 	//Deal result
@@ -133,6 +134,10 @@ void ChatRoom::TcpConnection::handleRead()
 
 void ChatRoom::TcpConnection::handleWrite()
 {
+	if(sockState_ == kDisconnecting) {
+		handleClose();
+		return;
+	}
 	printf("File: TcpConnection.cc, TcpConnection::handleWrite function.\n");
 	if(inputBuffer_.isEmpty()){
 		printf("File: TcpConnection.cc, TcpConnection::handleWrite function, inputBuffer is empty.\n");
@@ -154,7 +159,7 @@ void ChatRoom::TcpConnection::handleWrite()
 		}
 		if(writeCallback_) writeCallback_(shared_from_this());
 	}
-	else if (result == 0) handleClose();
+	//else if (result == 0) handleClose();
 	else
 	{
 		errno = Errno;

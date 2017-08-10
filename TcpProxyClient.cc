@@ -11,7 +11,6 @@ TcpProxyClient::TcpProxyClient(EventLoop *loop, const struct sockaddr_in & serve
 	connector_ = std::make_shared<Connector>(loop,serverAddr_);
 	connector_->setConnectionCallback(std::bind(&TcpProxyClient::connectorCb,this,_1));
 	tcpConn_ = nullptr;
-
 }
 
 TcpProxyClient::~TcpProxyClient(){
@@ -33,7 +32,7 @@ void TcpProxyClient::connectorCb(int sockfd){
 	const struct sockaddr local = getLocalAddr(sockfd);
 	localAddr_ = *sockaddr_in_cast(&local);
 	std::string name = "TcpProxyClient connect";
-	tcpConn_ = std::make_shared<TcpConnection>(loop_,sockfd,&localAddr_,&serverAddr_,name);
+	tcpConn_ = std::make_shared<TcpConnection>(loop_, sockfd, &localAddr_, &serverAddr_, name);
 	tcpConn_->setConnectedCallback(std::bind(&TcpProxyClient::handleNewConnection,this,_1));
 	tcpConn_->setCloseCallback(std::bind(&TcpProxyClient::handleClose,this,_1));
 	tcpConn_->setWriteCallback(std::bind(&TcpProxyClient::handleWrite,this,_1));

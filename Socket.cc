@@ -79,8 +79,9 @@ ssize_t ChatRoom::readvFromSocket(int sockfd, const iovec * iov, int iovcnt)
 ssize_t ChatRoom::writeToSocket(int sockfd, const void * buff, size_t length)
 {
 	printf("File: Socket.cc, writeToSocket function start.\n");
-	return write(sockfd, buff, length);
-	printf("File: Socket.cc, writeToSocket function end.\n");
+	int ans = write(sockfd, buff, length);
+	printf("File: Socket.cc, writeToSocket function, write %d bytes to %d.\n", ans, sockfd);
+	return ans;
 }
 
 ssize_t ChatRoom::writevToSocket(int sockfd, const iovec * iov, int iovcnt)

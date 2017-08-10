@@ -81,6 +81,7 @@ ssize_t ChatRoom::writeToSocket(int sockfd, const void * buff, size_t length)
 	printf("File: Socket.cc, writeToSocket function start.\n");
 	int ans = write(sockfd, buff, length);
 	printf("File: Socket.cc, writeToSocket function, write %d bytes to %d.\n", ans, sockfd);
+	if(ans < 0) printf("File: Socket.cc, writeToSocket function, errno is %s.\n", strerror(errno));
 	return ans;
 }
 

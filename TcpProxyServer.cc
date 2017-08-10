@@ -160,10 +160,9 @@ void TcpProxyServer::handleMessage(TcpConnectionPtr ptr, Buffer *buff){
 	std::shared_ptr<TcpProxyClient> client = std::static_pointer_cast<TcpProxyClient>(ptr->getContext2());
 	EventLoop *ioLoop = ptr->getLoop();
 	//if(client->isconnect()){
-	ioLoop->runInLoop(std::bind(&TcpProxyClient::send,client,buff));
+	ioLoop->runInLoop(std::bind(&TcpProxyClient::send, client, buff));
 	//}
 	//else{
-
 	//}
 }
 

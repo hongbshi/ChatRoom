@@ -175,6 +175,7 @@ void ChatRoom::TcpConnection::handleError()
 		channel_->disableWrite();
 		loop_->updateChannle(&*channel_);
 	}
+	if(sockState_ == kConnected) setStates(kDisconnecting);
 	//log something
 	//exit(-1);
 	//setStates(kDisconnected);

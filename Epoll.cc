@@ -11,12 +11,11 @@ Epoll::Epoll()
 	event_.resize(initialSize);
 }
 
-void Epoll::poll(int timeout,std::vector<Channel*>& activeChannel)
+void Epoll::poll(int timeout, std::vector<Channel*>& activeChannel)
 {
 	int size = event_.size();
 	int number = epoll_wait(epollfd_, &*event_.begin(), size, timeout);
-	//printf("File: Epoll.cc, poll function, Current listen fd size is %d\n",(int)activeChannel_.size());
-	printf("File: Epoll.cc, poll function. Epoll event size is %d.\n", number);
+	printf("File: Epoll.cc, poll function, Epoll event size is %d.\n", number);
 	if (number > 0) 
 	{
 		fillActiveChannel(number, activeChannel);
@@ -73,7 +72,7 @@ bool Epoll::hasChannel(Channel* ch)
 	return !(ch->getStatus() == kNew);
 }
 
-void Epoll::update(int operation,Channel* ch)
+void Epoll::update(int operation, Channel* ch)
 {
 	struct epoll_event event;
 	memset(&event, 0, sizeof(event));

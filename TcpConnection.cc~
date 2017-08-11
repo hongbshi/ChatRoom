@@ -58,6 +58,7 @@ void ChatRoom::TcpConnection::connectDestroyed()
 	if (sockState_ == kConnected)
 	{
 		channel_->disableAll();
+		loop_->updateChannle(&*channel_);
 	}
 	loop_->removeChannle(&*channel_);
 	printf("File: TcpConnection.cc, connectDestroyed function end.\n");
@@ -120,10 +121,11 @@ void ChatRoom::TcpConnection::send(Buffer & buff)
 void ChatRoom::TcpConnection::handleRead()
 {
 	//Get read result
+	//if(sockState_ == kDisconnected || sockState_ == kDisconnecting) return;
 	int Errno, result = outputBuffer_.readSocket(sockfd_, &Errno);
 	printf("File: TcpConnection.cc, TcpConnection::handleRead function, Read %d bytes.\n", result);
 	//Deal result
-	if (result > 0) messageCallback_(shared_from_this(),&outputBuffer_);
+	if (result > 0) messageCallback_(shared_from_this(), &outputBuffer_);
 	else if (result == 0) handleClose();	
 	else{
 		errno = Errno;
@@ -133,12 +135,16 @@ void ChatRoom::TcpConnection::handleRead()
 
 void ChatRoom::TcpConnection::handleWrite()
 {
+	//if(sockState_ == kDisconnecting) {
+	//	handleClose();
+	//	return;
+	//}
 	printf("File: TcpConnection.cc, TcpConnection::handleWrite function.\n");
+	if(!channel_->isWrite()) return;
 	if(inputBuffer_.isEmpty()){
-		printf("File: TcpConnection.cc, TcpConnection::handleWrite function, inputBuffer is empty.\n");
+		//printf("File: TcpConnection.cc, TcpConnection::handleWrite function, inputBuffer is empty.\n");
 		channel_->disableWrite();
 		loop_->updateChannle(&*channel_);
-		//printf("abc\n");
 		if(writeCallback_) writeCallback_(shared_from_this());
 		printf("File: TcpConnection.cc, TcpConnection::handleWrite function leave.\n");
 		return;
@@ -154,7 +160,7 @@ void ChatRoom::TcpConnection::handleWrite()
 		}
 		if(writeCallback_) writeCallback_(shared_from_this());
 	}
-	else if (result == 0) handleClose();
+	//else if (result == 0) handleClose();
 	else
 	{
 		errno = Errno;
@@ -166,6 +172,11 @@ void ChatRoom::TcpConnection::handleWrite()
 void ChatRoom::TcpConnection::handleError()
 {
 	printf("File: TcpConnection.cc, TcpConnection::handleError function.\n");
+	if(channel_->isWrite()){
+		channel_->disableWrite();
+		loop_->updateChannle(&*channel_);
+	}
+	if(sockState_ == kConnected) setStates(kDisconnecting);
 	//log something
 	//exit(-1);
 	//setStates(kDisconnected);
@@ -199,8 +210,11 @@ void ChatRoom::TcpConnection::sendInLoop(std::string & s)
 	//printf("%s\n", str.c_str());
 	channel_->enableWrite();
 	loop_->updateChannle(&*channel_);
-	int Errno, result = inputBuffer_.writeSocket(sockfd_,&Errno); //try send one time
-	if(result < 0) printf("File: TcpConnection.cc, sendInLoop function, send data error.\n");
+	int Errno, result = inputBuffer_.writeSocket(sockfd_, &Errno); //try send one time
+	if(result < 0){
+		printf("File: TcpConnection.cc, sendInLoop function, send data error.\n");
+		handleError();
+	}
 	//str = inputBuffer_.getString();
 	//printf("File: TcpConnection.cc, sendInloop function, current input buffer size is %d.\n", str.size());
 	//printf("%s\n",str.c_str());
@@ -252,5 +266,5 @@ void ChatRoom::TcpConnection::stopWriteInLoop(){
 }
 
 void ChatRoom::TcpConnection::defaultMessageCb(TcpConnectionPtr ptr, Buffer * buff){
-
+	buff->clear();
 }

@@ -24,7 +24,7 @@ void TcpProxyClient::connect(){
 
 void TcpProxyClient::disconnect(){
 	if(!isConnect_) return;
-	tcpConn_->close();
+	loop_->runInLoop(std::bind(&TcpConnection::connectDestroyed, tcpConn_));
 }
 
 void TcpProxyClient::connectorCb(int sockfd){

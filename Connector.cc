@@ -45,11 +45,11 @@ void Connector::startInloop(){
 	sockaddr *addr = sockaddr_cast(&serverAddr_);
 	short port = ntohs(serverAddr_.sin_port);
 	char ip[64];
-	inet_ntop(AF_INET,(void*)(&serverAddr_.sin_addr),ip,sizeof ip);
-	printf("File: Connector.cc, startInloop funtion, serverAddr_.sin_addr %s\n", ip);
-	printf("File: Connector.cc, startInloop funtion, serverAddr_.sin_port %d\n", port);
+	inet_ntop(AF_INET, (void*)(&serverAddr_.sin_addr), ip, sizeof ip);
+	printf("File: Connector.cc, startInloop funtion, serverAddr_ is %s:%d.\n", ip, port);
+	//printf("File: Connector.cc, startInloop funtion, serverAddr_.sin_port %d\n", port);
 	int len = sizeof serverAddr_;
-	printf("File: Connector.cc, startInloop funtion, serverAddr_ length is %d\n", len);
+	//printf("File: Connector.cc, startInloop funtion, serverAddr_ length is %d\n", len);
 	int result = connectAddress(sockfd, addr, len);
 
 	if(result < 0 && errno != EINPROGRESS){
@@ -65,6 +65,7 @@ void Connector::startInloop(){
 		printf("File: Connector.cc, startInloop function, Connect First step Succeed.\n");
 		ch_ = new Channel(sockfd);
 		ch_->setWriteCallback(std::bind(&Connector::handleWrite,this));
+		ch_->disableRead();
 		ch_->enableWrite();
 		loop_->updateChannle(ch_);
 	}

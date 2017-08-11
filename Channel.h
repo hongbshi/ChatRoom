@@ -41,7 +41,7 @@ namespace ChatRoom
 
 		void disableRead()
 		{
-			Event_ &= ~kReadEvent;
+			Event_ &= (~kReadEvent);
 		}
 		
 		void enableWrite()
@@ -51,12 +51,12 @@ namespace ChatRoom
 
 		void disableWrite()
 		{
-			Event_ &= ~kWriteEvent;
+			Event_ &= (~kWriteEvent);
 		}
 
 		void disableAll()
 		{
-			Event_ &= kNoneEvent;
+			Event_ = kNoneEvent;
 		}
 
 		void enableAll()

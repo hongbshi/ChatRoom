@@ -58,6 +58,7 @@ void ChatRoom::TcpConnection::connectDestroyed()
 	if (sockState_ == kConnected)
 	{
 		channel_->disableAll();
+		loop_->updateChannle(&*channel_);
 	}
 	loop_->removeChannle(&*channel_);
 	printf("File: TcpConnection.cc, connectDestroyed function end.\n");
@@ -209,8 +210,11 @@ void ChatRoom::TcpConnection::sendInLoop(std::string & s)
 	//printf("%s\n", str.c_str());
 	channel_->enableWrite();
 	loop_->updateChannle(&*channel_);
-	int Errno, result = inputBuffer_.writeSocket(sockfd_,&Errno); //try send one time
-	if(result < 0) printf("File: TcpConnection.cc, sendInLoop function, send data error.\n");
+	int Errno, result = inputBuffer_.writeSocket(sockfd_, &Errno); //try send one time
+	if(result < 0){
+		printf("File: TcpConnection.cc, sendInLoop function, send data error.\n");
+		handleError();
+	}
 	//str = inputBuffer_.getString();
 	//printf("File: TcpConnection.cc, sendInloop function, current input buffer size is %d.\n", str.size());
 	//printf("%s\n",str.c_str());

@@ -40,7 +40,7 @@ void Connector::startInloop(){
 		if(state_ != kDisConnected) return;
 		state_ = kConnecting;
 	}
-	int sockfd = createNonblockSocket(AF_INET,SOCK_STREAM,IPPROTO_TCP);
+	int sockfd = createNonblockSocket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 	printf("File: Connector.cc, startInloop funtion, Connect sockfd is %d\n", sockfd);
 	sockaddr *addr = sockaddr_cast(&serverAddr_);
 	short port = ntohs(serverAddr_.sin_port);

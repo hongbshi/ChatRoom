@@ -13,7 +13,7 @@
 
 using namespace ChatRoom;
 
-Connector::Connector(EventLoop *loop, const struct sockaddr_in & server):loop_(loop),serverAddr_(server){
+Connector::Connector(EventLoop *loop, const struct sockaddr_in & server): loop_(loop), serverAddr_(server){
 	connCb_ = nullptr;
 	state_ = kDisConnected;
 }
@@ -41,7 +41,7 @@ void Connector::startInloop(){
 		state_ = kConnecting;
 	}
 	int sockfd = createNonblockSocket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
-	printf("File: Connector.cc, startInloop funtion, Connect sockfd is %d\n", sockfd);
+	printf("File: Connector.cc, startInloop funtion, Connect sockfd is %d.\n", sockfd);
 	sockaddr *addr = sockaddr_cast(&serverAddr_);
 	short port = ntohs(serverAddr_.sin_port);
 	char ip[64];
@@ -59,7 +59,7 @@ void Connector::startInloop(){
 		closeSocket(sockfd);
 		std::lock_guard<std::mutex> guard(mu_);
 		state_ = kDisConnected;
-		loop_->runInLoop(std::bind(&Connector::startInloop,this)); //Try again, add timer will be better
+		loop_->runInLoop(std::bind(&Connector::startInloop, this)); //Try again, add timer will be better
 	}
 	else{
 		printf("File: Connector.cc, startInloop function, Connect First step Succeed.\n");

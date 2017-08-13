@@ -73,7 +73,7 @@ void ChatRoom::Acceptor::handleRead()
 	printf("File: Acceptor.cc, Acceptor::handleRead funcion, new connect sockfd is %d.\n", connectFd);
 	if (connectFd >= 0)
 	{
-	    	setNonblock(connectFd);
+	    setNonblock(connectFd);
 		if (newConnectCallback_)
 			newConnectCallback_(connectFd, clientAddr);
 		else

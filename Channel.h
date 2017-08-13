@@ -1,8 +1,8 @@
 #ifndef  ChatRoom_Channel_H
-#define ChatRoom_Channel_H
+#define  ChatRoom_Channel_H
 
-#include<sys/epoll.h>
-#include<functional>
+#include <sys/epoll.h>
+#include <functional>
 namespace ChatRoom
 {
 	const int kNew = -1;

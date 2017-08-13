@@ -28,8 +28,8 @@ ChatRoom::TcpConnection::TcpConnection(EventLoop * loop,
 	connectedCallback_= nullptr;
 	closeCallback_ = nullptr;
 	writeCallback_ = nullptr;
-	messageCallback_ = std::bind(&TcpConnection::defaultMessageCb,_1,_2);
-	channel_->setCloseCallback(std::bind(&TcpConnection::handleClose,this));
+	messageCallback_ = std::bind(&TcpConnection::defaultMessageCb, _1, _2);
+	channel_->setCloseCallback(std::bind(&TcpConnection::handleClose, this));
 	channel_->setReadCallback(std::bind(&TcpConnection::handleRead, this));
 	channel_->setErrorCallback(std::bind(&TcpConnection::handleError, this));
 	channel_->setWriteCallback(std::bind(&TcpConnection::handleWrite, this));
@@ -46,7 +46,7 @@ void ChatRoom::TcpConnection::connectEstablished()
 	assert(sockState_ == kConnecting);
 	setStates(kConnected);
 	channel_->enableRead();
-	channel_->enableWrite();
+	//channel_->enableWrite();
 	loop_->updateChannle(&*channel_);
 	if (connectedCallback_) connectedCallback_(shared_from_this());
 	printf("File: TcpConnection.cc, TcpConnection::connectEstablished function end.\n");
@@ -149,7 +149,7 @@ void ChatRoom::TcpConnection::handleWrite()
 		printf("File: TcpConnection.cc, TcpConnection::handleWrite function leave.\n");
 		return;
 	}
-	int Errno, result = inputBuffer_.writeSocket(sockfd_, &Errno);
+	int savedErrno, result = inputBuffer_.writeSocket(sockfd_, &savedErrno);
 	if (result > 0)
 	{
 		printf("File: TcpConnection.cc, TcpConnection::handleWrite function, write %d bytes.\n", result);
@@ -163,7 +163,7 @@ void ChatRoom::TcpConnection::handleWrite()
 	//else if (result == 0) handleClose();
 	else
 	{
-		errno = Errno;
+		errno = savedErrno;
 		handleError();
 	}
 	printf("File: TcpConnection.cc, TcpConnection::handleWrite function end.\n");
@@ -210,9 +210,10 @@ void ChatRoom::TcpConnection::sendInLoop(std::string & s)
 	//printf("%s\n", str.c_str());
 	channel_->enableWrite();
 	loop_->updateChannle(&*channel_);
-	int Errno, result = inputBuffer_.writeSocket(sockfd_, &Errno); //try send one time
+	int savedErrno, result = inputBuffer_.writeSocket(sockfd_, &savedErrno); //try send one time
 	if(result < 0){
 		printf("File: TcpConnection.cc, sendInLoop function, send data error.\n");
+		errno = savedErrno;
 		handleError();
 	}
 	//str = inputBuffer_.getString();

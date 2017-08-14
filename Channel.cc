@@ -34,6 +34,7 @@ void Channel::handleEvent()
 	if ((ev & EPOLLERR) && errorCallback_){
 		printf("File: Channel.cc, Channel::handleEvent function, error event.\n");
 		errorCallback_();
+		return;
 	}
 	if ((ev & EPOLLOUT) && writeCallback_){
 		printf("File: Channel.cc, Channel::handleEvent function, write event.\n");

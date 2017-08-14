@@ -29,10 +29,9 @@ int ChatRoom::bindAddress(int sockfd,
 	printf("File: Socket.cc, ChatRoom::bindAddress function, bind sockfd is %d.\n", sockfd);
 	const struct sockaddr_in *tmp = sockaddr_in_cast(addr);
 	int port = ntohs(tmp->sin_port);
-	printf("File: Socket.cc, ChatRoom::bindAddress function, bind port is %d.\n", port);
 	char ip[64];
-	inet_ntop(AF_INET,(const void*)(&(tmp->sin_addr)),ip,60);
-	printf("File: Socket.cc, ChatRoom::bindAddress function, bind ip is %s.\n", ip);
+	inet_ntop(AF_INET, (const void*)(&(tmp->sin_addr)), ip, 60);
+	printf("File: Socket.cc, ChatRoom::bindAddress function, bind addr is %s:%d.\n", ip,port);
 	return bind(sockfd, addr, length);
 }
 

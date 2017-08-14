@@ -3,6 +3,8 @@
 
 #include <sys/epoll.h>
 #include <functional>
+#include <memory>
+
 namespace ChatRoom
 {
 	const int kNew = -1;
@@ -85,27 +87,35 @@ namespace ChatRoom
 			return fd_;
 		}
 
-		int getEvent()
-		{
+		int getEvent(){
 			return Event_;
 		}
 
-		int getStatus()
-		{
+		int getStatus(){
 			return status_;
 		}
 
-		void setStatus(int status)
-		{
+		void setStatus(int status){
 			status_ = status;
 		}
 		
-		void setReEvent(int revent)
-		{
+		void setReEvent(int revent){
 			reEvent_ = revent;
 		}
+
+		void setWeakContext(std::shared_ptr<void> ptr){
+			tie_ = true;
+			context_ = ptr;
+		}
+
+		std::weak_ptr<void> getWeakContext(){
+			return context_;
+		}
+
 		void handleEvent();
 	private:
+		void handleEventWithGuard();
+
 		static int const kReadEvent;
 		static int const kWriteEvent;
 		static int const kNoneEvent;
@@ -117,6 +127,8 @@ namespace ChatRoom
 		int reEvent_;    //receive event from epoll 
 		int fd_;        //listen fd
 		int status_; //for epoll to use
+		bool tie_;
+		std::weak_ptr<void> context_;
 	};
 }
 #endif // ! ChatRoom_Channel_H

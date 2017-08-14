@@ -56,7 +56,7 @@ namespace ChatRoom
 		ConnCb connCb_;
 		std::mutex mu_;
 		States state_;
-		Channel *ch_;  //
+		std::shared_ptr<Channel> ch_;  //
 	};
 }
 #endif // ! ChatRoom_Connector_H

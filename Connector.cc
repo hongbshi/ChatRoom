@@ -63,11 +63,10 @@ void Connector::startInloop(){
 	}
 	else{
 		printf("File: Connector.cc, startInloop function, Connect First step Succeed.\n");
-		ch_ = new Channel(sockfd);
+		ch_ = std::make_shared<Channel>(sockfd);
 		ch_->setWriteCallback(std::bind(&Connector::handleWrite,this));
-		ch_->disableRead();
 		ch_->enableWrite();
-		loop_->updateChannle(ch_);
+		loop_->updateChannle(&*ch_);
 	}
 }
 
@@ -83,12 +82,11 @@ void Connector::stopInloop(){
 }
 
 int Connector::resetChannel(){
-	printf("File: Connector.cc, resetChannel function.\n");
+	//printf("File: Connector.cc, resetChannel function.\n");
 	int sockfd = ch_->getfd();
 	ch_->disableAll();
-	loop_->removeChannle(ch_);
-	delete ch_;
-	ch_ = nullptr;
+	loop_->updateChannle(&*ch_);
+	loop_->removeChannle(&*ch_);
 	return sockfd;
 }
 

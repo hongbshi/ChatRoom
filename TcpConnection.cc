@@ -141,14 +141,14 @@ void ChatRoom::TcpConnection::handleWrite()
 	//}
 	printf("File: TcpConnection.cc, TcpConnection::handleWrite function.\n");
 	if(!channel_->isWrite()) return;
-	if(inputBuffer_.isEmpty()){
-		//printf("File: TcpConnection.cc, TcpConnection::handleWrite function, inputBuffer is empty.\n");
-		channel_->disableWrite();
-		loop_->updateChannle(&*channel_);
-		if(writeCallback_) writeCallback_(shared_from_this());
-		printf("File: TcpConnection.cc, TcpConnection::handleWrite function leave.\n");
-		return;
-	}
+	//if(inputBuffer_.isEmpty()){
+	//	//printf("File: TcpConnection.cc, TcpConnection::handleWrite function, inputBuffer is empty.\n");
+	//	channel_->disableWrite();
+	//	loop_->updateChannle(&*channel_);
+	//	if(writeCallback_) writeCallback_(shared_from_this());
+	//	printf("File: TcpConnection.cc, TcpConnection::handleWrite function leave.\n");
+	//	return;
+	//}
 	int savedErrno, result = inputBuffer_.writeSocket(sockfd_, &savedErrno);
 	if (result >= 0)
 	{
@@ -172,7 +172,7 @@ void ChatRoom::TcpConnection::handleError()
 {
 	printf("File: TcpConnection.cc, TcpConnection::handleError function.\n");
 	//if(errno == EAGAIN) return;
-	handleClose();
+	//handleClose();
 	//if(channel_->isWrite()){
 	//	channel_->disableWrite();
 	//	loop_->updateChannle(&*channel_);
@@ -216,20 +216,24 @@ void ChatRoom::TcpConnection::sendInLoop(std::string & s)
 	//std::string str = inputBuffer_.getString();
 	//printf("File: TcpConnection.cc, sendInloop function, current input buffer size is %d.\n", str.size());
 	//printf("%s\n", str.c_str());
-	channel_->enableWrite();
-	loop_->updateChannle(&*channel_);
 	int savedErrno, result = inputBuffer_.writeSocket(sockfd_, &savedErrno); //try send one time
 	if(result < 0 && errno != EAGAIN){
-		printf("File: TcpConnection.cc, sendInLoop function, send data error.\n");
-		errno = savedErrno;
-		handleError();
+		printf("File: TcpConnection.cc, sendInLoop function, send data fatal error.\n");
+		//channel_->disableWrite();
+		//loop_->updateChannle(&*channel_);
+		setStates(kDisconnecting);
 		return;
+		//errno = savedErrno;
+		//handleError();
+		//return;
 	}
 	//str = inputBuffer_.getString();
 	//printf("File: TcpConnection.cc, sendInloop function, current input buffer size is %d.\n", str.size());
 	//printf("%s\n",str.c_str());
-	if(inputBuffer_.isEmpty()) {
-	    channel_->disableWrite();
+	if(!inputBuffer_.isEmpty()) {
+	    //channel_->disableWrite();
+		//loop_->updateChannle(&*channel_);
+		channel_->enableWrite();
 		loop_->updateChannle(&*channel_);
 	}
 	printf("File: TcpConnection.cc, leave sendInLoop function.\n");

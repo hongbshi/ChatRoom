@@ -37,9 +37,7 @@ void TcpProxyClient::connectorCb(int sockfd){
 	tcpConn_->setCloseCallback(std::bind(&TcpProxyClient::handleClose,this,_1));
 	tcpConn_->setWriteCallback(std::bind(&TcpProxyClient::handleWrite,this,_1));
 	tcpConn_->setMessageCallback(std::bind(&TcpProxyClient::handleMessage,this,_1,_2));
-	//if(connCb_) connCb_(tcpConn_);
 	loop_->runInLoop(std::bind(&TcpConnection::connectEstablished, tcpConn_));
-	//if(!inBuff_.isEmpty()) tcpConn_->startWrite();
 }
 
 void TcpProxyClient::handleNewConnection(TcpConnectionPtr ptr){

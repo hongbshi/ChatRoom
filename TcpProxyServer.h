@@ -21,7 +21,6 @@ namespace ChatRoom
 		typedef std::shared_ptr<TcpConnection> TcpConnectionPtr;
 		typedef std::function<void(EventLoop*)> ThreadInitialCallback;
 		typedef std::function<void(TcpConnectionPtr ptr)> NewConnectionCallback;
-		//typedef std::function<void(TcpConnectionPtr ptr)> WriteCompleteCallback();
 		typedef std::function<void(TcpConnectionPtr ptr, Buffer* buff)> MessageCallback;
 		typedef std::function<void(TcpConnectionPtr ptr)> CloseCallback;
 		TcpProxyServer(EventLoop *loop, const std::string & addrConf, bool reusePort = false);
@@ -50,6 +49,10 @@ namespace ChatRoom
 		void removeConnectionInLoop(TcpConnectionPtr ptr);
 		void handleWrite(TcpConnectionPtr ptr);
 		void handleMessage(TcpConnectionPtr ptr, Buffer *buff);
+		//For TcpProxyClient
+		typedef std::shared_ptr<TcpProxyClient> TcpProxyClientPtr;
+		void newClient(TcpProxyClientPtr ptr); 
+		void closeClient(TcpProxyClientPtr ptr);
 		//Variable
 		EventLoop* loop_;
 		std::string addrConf_;

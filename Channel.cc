@@ -26,14 +26,6 @@ void Channel::handleEvent(){
 void Channel::handleEventWithGuard()
 {
 	printf("File: Channel.cc, Channel::handleEventWithGuard function, channel fd is %d.\n", fd_);
-	//
-	//if(reEvent_ & EPOLLIN) printf("EPOLLIN\n");
-	//if(reEvent_ & EPOLLPRI) printf("EPOLLPRI\n");
-	//if(reEvent_ & EPOLLRDHUP) printf("EPOLLRDHUP\n");
-	//if(reEvent_ & EPOLLOUT) printf("EPOLLOUT\n");
-	//if(reEvent_ & EPOLLERR) printf("EPOLLERR\n");
-	//if(reEvent_ & EPOLLHUP) printf("EPOLLHUP\n");
-	//
 	int ev = reEvent_;
 	if (ev == kNoneEvent) return;
 	if(!(ev & EPOLLIN) && (ev & EPOLLHUP) && closeCallback_){
@@ -44,18 +36,16 @@ void Channel::handleEventWithGuard()
 		printf("File: Channel.cc, Channel::handleEventWithGuard function, error event.\n");
 		errorCallback_();
 	}
-	if ((ev & EPOLLOUT) && writeCallback_){
-		printf("File: Channel.cc, Channel::handleEventWithGuard function, write event.\n");
-		writeCallback_();
-	}
 	if ((ev & (EPOLLIN | EPOLLPRI | EPOLLRDHUP)) && readCallback_){
 		printf("File: Channel.cc, Channel::handleEventWithGuard function, read event.\n");
 		readCallback_();
+	}
+	if ((ev & EPOLLOUT) && writeCallback_){
+		printf("File: Channel.cc, Channel::handleEventWithGuard function, write event.\n");
+		writeCallback_();
 	}
 }
 
 int const Channel::kNoneEvent = 0;
 int const Channel::kReadEvent = (EPOLLIN | EPOLLPRI);
 int const Channel::kWriteEvent = EPOLLOUT;
-
-

@@ -17,26 +17,27 @@ namespace ChatRoom
 	class Connector;
 	class Buffer;
 	//Not Thread safe
-	class TcpProxyClient
+	class TcpProxyClient: public std::enable_shared_from_this<TcpProxyClient>
 	{
 	public:
 		typedef std::shared_ptr<TcpConnection> TcpConnectionPtr;
-		//typedef std::function<void(TcpConnectionPtr ptr)> NewConnectionCallback;
-		//typedef std::function<void(TcpConnectionPtr ptr)> WriteCallback;
-		//typedef std::function<void(TcpConnectionPtr ptr, Buffer* buff)> MessageCallback;
-		//typedef std::function<void(TcpConnectionPtr ptr)> CloseCallback;
+		typedef std::shared_ptr<TcpProxyClient> TcpProxyClientPtr;
+		typedef std::function<void(TcpProxyClientPtr ptr)> NewConnectionCallback;
+		//typedef std::function<void(TcpProxyClientPtr ptr)> WriteCallback;
+		//typedef std::function<void(TcpProxyClientPtr ptr, Buffer* buff)> MessageCallback;
+		typedef std::function<void(TcpProxyClientPtr ptr)> CloseCallback;
 
 		TcpProxyClient(EventLoop * loop, const struct sockaddr_in & server);
 		~TcpProxyClient();
 		
-		//void setNewConnectionCallback(NewConnectionCallback & cb){ connCb_ = cb;}
-		//void setNewConnectionCallback(NewConnectionCallback && cb){ connCb_ = std::move(cb);}
+		void setNewConnectionCallback(NewConnectionCallback & cb){ connCb_ = cb;}
+		void setNewConnectionCallback(NewConnectionCallback && cb){ connCb_ = std::move(cb);}
 		//void setWriteCallback(WriteCallback & cb){ writeCb_ = cb;}
 		//void setWriteCallback(WriteCallback && cb){ writeCb_ = std::move(cb);}
 		//void setMessageCallback(MessageCallback & cb){ messCb_ = cb;}
 		//void setMessageCallback(MessageCallback && cb){ messCb_ = std::move(cb);}
-		//void setCloseCallback(CloseCallback & cb){ closeCb_ = cb;}
-		//void setCloseCallback(CloseCallback && cb){ closeCb_ = std::move(cb);}
+		void setCloseCallback(CloseCallback & cb){ closeCb_ = cb;}
+		void setCloseCallback(CloseCallback && cb){ closeCb_ = std::move(cb);}
 		
 		void connect();
 		void disconnect();
@@ -70,10 +71,10 @@ namespace ChatRoom
 		std::weak_ptr<TcpConnection> context_;
 		Buffer inBuff_;
 		Buffer outBuff_;
-		//NewConnectionCallback connCb_;
+		NewConnectionCallback connCb_;
 		//WriteCallback writeCb_;
 		//MessageCallback messCb_;
-		//CloseCallback closeCb_;
+		CloseCallback closeCb_;
 	};
 }
 #endif // ! ChatRoom_TcpProxyClient_H

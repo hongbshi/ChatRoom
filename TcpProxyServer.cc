@@ -64,8 +64,8 @@ void TcpProxyServer::removeConnectionInLoop(TcpConnectionPtr ptr)
 	conn_.erase(ptr->getName());
 	EventLoop* ioloop = ptr->getLoop();
 	ioloop->runInLoop(std::bind(&TcpConnection::connectDestroyed, ptr));
-	std::shared_ptr<TcpProxyClient> client = std::static_pointer_cast<TcpProxyClient>(ptr->getContext2());
-	ioloop->runInLoop(std::bind(&TcpProxyClient::disconnect, client));
+	//std::shared_ptr<TcpProxyClient> client = std::static_pointer_cast<TcpProxyClient>(ptr->getContext2());
+	//ioloop->runInLoop(std::bind(&TcpProxyClient::disconnect, client));
 }
 
 TcpProxyServer::TcpProxyServer(EventLoop * loop, 

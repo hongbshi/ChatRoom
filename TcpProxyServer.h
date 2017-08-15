@@ -15,6 +15,7 @@ namespace ChatRoom
 	class TcpConnection;
 	class ThreadPool;
 	class Buffer;
+	class TcpProxyClient;
 	class TcpProxyServer
 	{
 	public:
@@ -51,8 +52,8 @@ namespace ChatRoom
 		void handleMessage(TcpConnectionPtr ptr, Buffer *buff);
 		//For TcpProxyClient
 		typedef std::shared_ptr<TcpProxyClient> TcpProxyClientPtr;
-		void newClient(TcpProxyClientPtr ptr); 
-		void closeClient(TcpProxyClientPtr ptr);
+		void newClientCb(TcpProxyClientPtr ptr); 
+		void closeClientCb(TcpProxyClientPtr ptr);
 		//Variable
 		EventLoop* loop_;
 		std::string addrConf_;
@@ -63,6 +64,7 @@ namespace ChatRoom
 		std::shared_ptr<Acceptor> acceptor_;
 		std::shared_ptr<ThreadPool> threadPool_;
 		std::map<std::string, TcpConnectionPtr> conn_;
+		std::map<std::string, TcpProxyClientPtr> client_;
 		//Call back
 		ThreadInitialCallback threadInitialCallback_;
 		NewConnectionCallback newConnectionCallback_;

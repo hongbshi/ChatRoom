@@ -98,12 +98,12 @@ namespace ChatRoom
 			return context_;
 		}
 		
-		void setContext2(std::shared_ptr<void> ptr){
-			context2_ = ptr;
+		void setWeakContext(std::shared_ptr<void> ptr){
+			weakContext_ = ptr;
 		}
 
-		std::shared_ptr<void> getContext2(){
-			return context2_;
+		std::weak_ptr<void> getWeakContext(){
+			return weakContext_;
 		}
 
 	private:
@@ -141,7 +141,7 @@ namespace ChatRoom
 		static int number;
 
 		std::shared_ptr<void> context_;
-		std::shared_ptr<void> context2_;
+		std::weak_ptr<void> weakContext_;
 	};
 }
 #endif // ! ChatRoom_TcpConnection_H

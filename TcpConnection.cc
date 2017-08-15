@@ -4,9 +4,11 @@
 #include <memory>
 #include <fcntl.h>
 #include <stdio.h>
+#include <string.h>
 #include <stdlib.h>
 #include <assert.h>
 #include <unistd.h>
+
 using namespace ChatRoom;
 using namespace std::placeholders;
 int ChatRoom::TcpConnection::number = 1;
@@ -22,8 +24,7 @@ ChatRoom::TcpConnection::TcpConnection(EventLoop * loop,
 	name_(name),
 	sockState_(kConnecting), 
 	channel_(std::make_shared<Channel>(sockfd_)),
-	context_(),
-	context2_()
+	context_()
 {
 	connectedCallback_= nullptr;
 	closeCallback_ = nullptr;
@@ -99,7 +100,7 @@ void ChatRoom::TcpConnection::shutdownWrite()
 
 void ChatRoom::TcpConnection::send(std::string & s)
 {
-	loop_->runInLoop(std::bind(&TcpConnection::sendInLoop, shared_from_this(),s));
+	loop_->runInLoop(std::bind(&TcpConnection::sendInLoop, shared_from_this(), s));
 }
 
 void ChatRoom::TcpConnection::send(std::string && s)
@@ -122,7 +123,7 @@ void ChatRoom::TcpConnection::send(Buffer & buff)
 void ChatRoom::TcpConnection::handleRead()
 {
 	//Get read result
-	//if(sockState_ == kDisconnected || sockState_ == kDisconnecting) return;
+	if(sockState_ == kDisconnected || sockState_ == kDisconnecting) return;
 	int savedErrno, result = outputBuffer_.readSocket(sockfd_, &savedErrno);
 	printf("File: TcpConnection.cc, TcpConnection::handleRead function, Read %d bytes.\n", result);
 	//Deal result
@@ -166,7 +167,7 @@ void ChatRoom::TcpConnection::handleError()
 	//	loop_->updateChannle(&*channel_);
 	//	setStates(kDisconnecting);
 	//}
-	//handleClose();
+	if(errno == ECONNRESET) handleClose();
 	//if(channel_->isWrite()){
 	//	channel_->disableWrite();
 	//	loop_->updateChannle(&*channel_);

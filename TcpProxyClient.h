@@ -10,6 +10,10 @@
 #include <utility>
 #include <memory>
 
+#include <string>
+
+using std::string;
+
 namespace ChatRoom
 {
 	class EventLoop;
@@ -27,7 +31,7 @@ namespace ChatRoom
 		//typedef std::function<void(TcpProxyClientPtr ptr, Buffer* buff)> MessageCallback;
 		typedef std::function<void(TcpProxyClientPtr ptr)> CloseCallback;
 
-		TcpProxyClient(EventLoop * loop, const struct sockaddr_in & server);
+		TcpProxyClient(EventLoop * loop, const struct sockaddr_in & server, const string & name);
 		~TcpProxyClient();
 		
 		void setNewConnectionCallback(NewConnectionCallback & cb){ connCb_ = cb;}
@@ -45,12 +49,20 @@ namespace ChatRoom
 
 		void send(Buffer *buff);
 
-		void setContext(std::shared_ptr<TcpConnection> ptr){
-			context_ = ptr;
+		void setWeakContext(std::shared_ptr<TcpConnection> ptr){
+			weakContext_ = ptr;
 		}
 
-		std::weak_ptr<TcpConnection> getContext(){
-			return context_;
+		std::weak_ptr<TcpConnection> getWeakContext(){
+			return weakContext_;
+		}
+
+		static int getNum(){
+			return num_++;
+		}
+
+		std::string getName(){
+			return name_;
 		}
 
 	private:
@@ -68,13 +80,15 @@ namespace ChatRoom
 		bool isConnect_;
 		std::shared_ptr<Connector> connector_;
 		TcpConnectionPtr tcpConn_;
-		std::weak_ptr<TcpConnection> context_;
+		std::weak_ptr<TcpConnection> weakContext_;
 		Buffer inBuff_;
 		Buffer outBuff_;
 		NewConnectionCallback connCb_;
 		//WriteCallback writeCb_;
 		//MessageCallback messCb_;
 		CloseCallback closeCb_;
+		string name_;
+		static int num_;
 	};
 }
 #endif // ! ChatRoom_TcpProxyClient_H

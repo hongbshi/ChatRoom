@@ -15,7 +15,6 @@ using namespace std::placeholders;
 void TcpProxyServer::newConnection(int sockfd, const struct sockaddr & clientAddr)
 {
 	printf("File: TcpProxyServer.cc, TcpProxyServer::newConnection function.\n");
-	//
 	char buff[32];
 	int number = ChatRoom::TcpConnection::getNumber();
 	snprintf(buff, sizeof buff, "%s,%d", "TcpConnection", number);
@@ -35,22 +34,36 @@ void TcpProxyServer::newConnection(int sockfd, const struct sockaddr & clientAdd
     //Create TcpProxyClient
 	struct sockaddr_in serverAddr;
 	if(!ServerAddr::getNext(serverAddr)){
-		printf("File: TcpProxyServer, newConnection function, ServerAddr::getNext eror!\n");
-		closeSocket(sockfd);
+		printf("File: TcpProxyServer, newConnection function, ServerAddr::getNext eror.\n");
+		conn_.erase(name);
 		return;
 	}
-	std::shared_ptr<TcpProxyClient> client = std::make_shared<TcpProxyClient>(loop, serverAddr);
-	//client->setNewConnectionCallback(std::bind(&TcpProxyServer::handleNewConnection,this,_1));
+	number = ChatRoom::TcpProxyClient::getNum();
+	snprintf(buff, sizeof buff, "%s,%d", "TcpProxyClient", number);
+	std::string cName(buff);
+	std::shared_ptr<TcpProxyClient> client = std::make_shared<TcpProxyClient>(loop, serverAddr, cName);
+	client->setNewConnectionCallback(std::bind(&TcpProxyServer::newClientCb, this, _1));
 	//client->setWriteCallback(std::bind(&TcpProxyServer::handleWrite,this,_1));
 	//client->setMessageCallback(std::bind(&TcpProxyServer::handleMessage,this,_1,_2));
-	//client->setCloseCallback(std::bind(&TcpProxyServer::handleClose,this,_1));
+	client->setCloseCallback(std::bind(&TcpProxyServer::closeClientCb, this, _1));
 	//Connect TcpConnection and TcpProxyClient
-	conn->setContext2(std::static_pointer_cast<void>(client));
-	client->setContext(conn);
+	conn->setWeakContext(std::static_pointer_cast<void>(client));
+	client->setWeakContext(conn);
+	client_.insert(std::make_pair(cName, client));
     //	
 	loop->runInLoop(std::bind(&TcpConnection::connectEstablished,conn));
 	//loop->runInLoop(std::bind(&TcpProxyClient::connect,client));
 	printf("File: TcpProxyServer.cc, TcpProxyServer::newConnection function end.\n");
+}
+
+void TcpProxyServer::newClientCb(TcpProxyClientPtr ptr){
+	//std::string name = ptr->getName();
+	//client_.insert(std::make_pair(name, ptr));
+}
+
+void TcpProxyServer::closeClientCb(TcpProxyClientPtr ptr){
+	std::string name = ptr->getName();
+	client_.erase(name);
 }
 
 void TcpProxyServer::removeConnection(TcpConnectionPtr ptr)
@@ -78,53 +91,43 @@ TcpProxyServer::TcpProxyServer(EventLoop * loop,
 	threadInitialCallback_(),
 	threadPool_(nullptr){}
 
-void TcpProxyServer::setThreadNum(const unsigned int num)
-{
+void TcpProxyServer::setThreadNum(const unsigned int num){
 	threadNum_ = num;
 }
 
-void TcpProxyServer::setThreadInitialCallback(ThreadInitialCallback & initial)
-{
+void TcpProxyServer::setThreadInitialCallback(ThreadInitialCallback & initial){
 	threadInitialCallback_ = initial;
 }
 
-void TcpProxyServer::setThreadInitialCallback(ThreadInitialCallback && initial)
-{
+void TcpProxyServer::setThreadInitialCallback(ThreadInitialCallback && initial){
 	threadInitialCallback_ = std::move(initial);
 }
 
-void TcpProxyServer::setNewConnectionCallback(NewConnectionCallback & cb)
-{
+void TcpProxyServer::setNewConnectionCallback(NewConnectionCallback & cb){
 	newConnectionCallback_ = cb;
 }
 
-void TcpProxyServer::setNewConnectionCallback(NewConnectionCallback && cb)
-{
+void TcpProxyServer::setNewConnectionCallback(NewConnectionCallback && cb){
 	newConnectionCallback_ = std::move(cb);
 }
 
-void TcpProxyServer::setMessageCallback(MessageCallback & cb)
-{
+void TcpProxyServer::setMessageCallback(MessageCallback & cb){
 	messageCallback_ = cb;
 }
 
-void TcpProxyServer::setMessageCallback(MessageCallback && cb)
-{
+void TcpProxyServer::setMessageCallback(MessageCallback && cb){
 	messageCallback_ = std::move(cb);
 }
 
-void TcpProxyServer::setCloseCallback(CloseCallback & cb)
-{
+void TcpProxyServer::setCloseCallback(CloseCallback & cb){
 	closeCallback_ = cb;
 }
 
-void TcpProxyServer::setCloseCallback(CloseCallback && cb)
-{
+void TcpProxyServer::setCloseCallback(CloseCallback && cb){
 	closeCallback_ = std::move(cb);
 }
 
-void TcpProxyServer::start()
-{
+void TcpProxyServer::start(){
 	std::vector<struct sockaddr_in> addr;
 	if(!ReadAddr::readServerAddr(addrConf_.c_str(), addr)){
 		printf("File: TcpProxyServer, start function, read addrConf file error!\n");
@@ -152,20 +155,15 @@ void TcpProxyServer::handleNewConnection(TcpConnectionPtr ptr){
 	//
 }
 
-//void TcpProxyServer::handleWrite(TcpConnectionPtr ptr){
-//
-//}
-
 void TcpProxyServer::handleMessage(TcpConnectionPtr ptr, Buffer *buff){
-	std::shared_ptr<TcpProxyClient> client = std::static_pointer_cast<TcpProxyClient>(ptr->getContext2());
 	EventLoop *ioLoop = ptr->getLoop();
-	//if(client->isconnect()){
-	ioLoop->runInLoop(std::bind(&TcpProxyClient::send, client, buff));
-	//}
-	//else{
-	//}
+	std::shared_ptr<void> tmp(ptr->getWeakContext().lock());
+	if(tmp){
+	    std::shared_ptr<TcpProxyClient> client = std::static_pointer_cast<TcpProxyClient>(tmp);
+		ioLoop->runInLoop(std::bind(&TcpProxyClient::send, client, buff));
+	}
+	else{
+		ptr->close();
+	}
 }
 
-//void TcpProxyServer::handleClose(TcpConnectionPtr ptr){
-//
-//}

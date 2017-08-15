@@ -6,7 +6,10 @@
 using namespace ChatRoom;
 using namespace std::placeholders;
 
-TcpProxyClient::TcpProxyClient(EventLoop *loop, const struct sockaddr_in & server):loop_(loop), serverAddr_(server){
+int TcpProxyClient::num_ = 0;
+
+TcpProxyClient::TcpProxyClient(EventLoop *loop, const struct sockaddr_in & server, const string & name)
+	:loop_(loop), serverAddr_(server), name_(name){
 	isConnect_ = false;
 	connector_ = std::make_shared<Connector>(loop, serverAddr_);
 	connector_->setConnectionCallback(std::bind(&TcpProxyClient::connectorCb, this, _1));
@@ -41,27 +44,28 @@ void TcpProxyClient::connectorCb(int sockfd){
 }
 
 void TcpProxyClient::handleNewConnection(TcpConnectionPtr ptr){
+	if(connCb_) connCb_(shared_from_this());
 	if(!inBuff_.isEmpty()) ptr->send(inBuff_);
 }
 
 void TcpProxyClient::handleMessage(TcpConnectionPtr ptr, Buffer* buff){
 	outBuff_.writeToBuffer(*buff);
-	auto spt = context_.lock();
+	auto spt = weakContext_.lock();
 	if(spt && spt->connected()) spt->send(outBuff_);
 	else handleClose(ptr);
 }
 
 void TcpProxyClient::handleClose(TcpConnectionPtr ptr){
 	if(!isConnect_) return;
+	std::shared_ptr<TcpProxyClient> guard(shared_from_this());
 	loop_->runInLoop(std::bind(&TcpConnection::connectDestroyed, ptr));
+	if(closeCb_) closeCb_(guard);
 	isConnect_ = false;
 	tcpConn_ = nullptr;
 }
 
 void TcpProxyClient::handleWrite(TcpConnectionPtr ptr){
-	if(inBuff_.isEmpty()){
-		ptr->stopWrite();
-	}
+	if(inBuff_.isEmpty()) ptr->stopWrite();
 	else ptr->send(inBuff_);
 }
 

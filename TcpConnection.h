@@ -38,23 +38,19 @@ namespace ChatRoom
 		~TcpConnection();
 
 		//when connect was completed,it was been called.
-		void setConnectedCallback(const ConnectedCallback & cb)
-		{
+		void setConnectedCallback(const ConnectedCallback & cb){
 			connectedCallback_ = cb;
 		}
 
-		void setCloseCallback(const CloseCallback & cb)
-		{
+		void setCloseCallback(const CloseCallback & cb){
 			closeCallback_ = cb;
 		}
 
-		void setWriteCallback(const WriteCallback & cb)
-		{
+		void setWriteCallback(const WriteCallback & cb){
 			writeCallback_ = cb;
 		}
 
-		void setMessageCallback(const MessageCallback & cb)
-		{
+		void setMessageCallback(const MessageCallback & cb){
 			messageCallback_ = cb;
 		}
 

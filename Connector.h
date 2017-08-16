@@ -50,6 +50,7 @@ namespace ChatRoom
 
 		int resetChannel();
 		void handleWrite();
+		void handleError();
 		
 		EventLoop *loop_;
 		struct sockaddr_in serverAddr_;

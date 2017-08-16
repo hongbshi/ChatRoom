@@ -11,7 +11,9 @@
 
 using namespace ChatRoom;
 using namespace std::placeholders;
+
 int ChatRoom::TcpConnection::number = 1;
+
 ChatRoom::TcpConnection::TcpConnection(EventLoop * loop, 
 	int sockfd, 
 	const struct sockaddr_in * localAddress, 
@@ -49,6 +51,7 @@ void ChatRoom::TcpConnection::connectEstablished()
 	channel_->enableRead();
 	channel_->setWeakContext(shared_from_this());
 	loop_->updateChannle(&*channel_);
+	setKeepLive(sockfd_);
 	if (connectedCallback_) connectedCallback_(shared_from_this());
 	printf("File: TcpConnection.cc, TcpConnection::connectEstablished function end.\n");
 }
@@ -62,17 +65,16 @@ void ChatRoom::TcpConnection::connectDestroyed()
 		channel_->disableAll();
 		loop_->updateChannle(&*channel_);
 	}
+	setStates(kDisconnected);
 	loop_->removeChannle(&*channel_);
 	printf("File: TcpConnection.cc, connectDestroyed function end.\n");
 }
 
-void ChatRoom::TcpConnection::startRead()
-{
+void ChatRoom::TcpConnection::startRead(){
 	loop_->runInLoop(std::bind(&TcpConnection::startReadInLoop, shared_from_this()));
 }
 
-void ChatRoom::TcpConnection::stopRead()
-{
+void ChatRoom::TcpConnection::stopRead(){
 	loop_->runInLoop(std::bind(&TcpConnection::stopReadInLoop, shared_from_this()));
 }
 
@@ -84,13 +86,11 @@ void ChatRoom::TcpConnection::stopWrite(){
 	loop_->runInLoop(std::bind(&TcpConnection::stopWriteInLoop,shared_from_this()));
 }
 
-void ChatRoom::TcpConnection::close()
-{
+void ChatRoom::TcpConnection::close(){
 	loop_->runInLoop(std::bind(&TcpConnection::closeInLoop, shared_from_this()));
 }
 
-void ChatRoom::TcpConnection::shutdownWrite()
-{
+void ChatRoom::TcpConnection::shutdownWrite(){
 	loop_->runInLoop(std::bind(&TcpConnection::shutdownWriteInLoop, shared_from_this()));
 }
 
@@ -98,23 +98,19 @@ void ChatRoom::TcpConnection::shutdownWrite()
 //{
 //}
 
-void ChatRoom::TcpConnection::send(std::string & s)
-{
+void ChatRoom::TcpConnection::send(std::string & s){
 	loop_->runInLoop(std::bind(&TcpConnection::sendInLoop, shared_from_this(), s));
 }
 
-void ChatRoom::TcpConnection::send(std::string && s)
-{
+void ChatRoom::TcpConnection::send(std::string && s){
 	loop_->runInLoop(std::bind(&TcpConnection::sendInLoop, shared_from_this(),std::move(s)));
 }
 
-void ChatRoom::TcpConnection::send(const Buffer & buff)
-{
+void ChatRoom::TcpConnection::send(const Buffer & buff){
 	send(buff.getString());
 }
 
-void ChatRoom::TcpConnection::send(Buffer & buff)
-{
+void ChatRoom::TcpConnection::send(Buffer & buff){
 	std::string str;
 	buff.readFromBuffer(str);
 	send(std::move(str));
@@ -123,7 +119,7 @@ void ChatRoom::TcpConnection::send(Buffer & buff)
 void ChatRoom::TcpConnection::handleRead()
 {
 	//Get read result
-	if(sockState_ == kDisconnected || sockState_ == kDisconnecting) return;
+	if(sockState_ == kDisconnected) return;
 	int savedErrno, result = outputBuffer_.readSocket(sockfd_, &savedErrno);
 	printf("File: TcpConnection.cc, TcpConnection::handleRead function, Read %d bytes.\n", result);
 	//Deal result
@@ -161,13 +157,13 @@ void ChatRoom::TcpConnection::handleWrite()
 void ChatRoom::TcpConnection::handleError()
 {
 	printf("File: TcpConnection.cc, TcpConnection::handleError function, error is %s.\n", strerror(errno));
-	//if(errno == EAGAIN) return;
-	//else {
+	//if(errno == ECONNRESET){
 	//	channel_->disableWrite();
 	//	loop_->updateChannle(&*channel_);
 	//	setStates(kDisconnecting);
 	//}
-	if(errno == ECONNRESET) handleClose();
+	handleClose();
+	//if(errno == ECONNRESET) handleClose();
 	//if(channel_->isWrite()){
 	//	channel_->disableWrite();
 	//	loop_->updateChannle(&*channel_);
@@ -223,29 +219,25 @@ void ChatRoom::TcpConnection::sendInLoop(std::string & s)
 	printf("File: TcpConnection.cc, leave sendInLoop function.\n");
 }
 
-void ChatRoom::TcpConnection::shutdownWriteInLoop()
-{
+void ChatRoom::TcpConnection::shutdownWriteInLoop(){
 	shutdownSocket(sockfd_, SHUT_WR);
 	channel_->disableWrite();
 	loop_->updateChannle(&*channel_);
 	setStates(kDisconnecting);
 }
 
-void ChatRoom::TcpConnection::closeInLoop()
-{
+void ChatRoom::TcpConnection::closeInLoop(){
 	setStates(kDisconnecting);
 	handleClose();
 }
 
-void ChatRoom::TcpConnection::startReadInLoop()
-{
+void ChatRoom::TcpConnection::startReadInLoop(){
 	if (channel_->isRead())	return;
 	channel_->enableRead();
 	loop_->updateChannle(&*channel_);
 }
 
-void ChatRoom::TcpConnection::stopReadInLoop()
-{
+void ChatRoom::TcpConnection::stopReadInLoop(){
 	if (!channel_->isRead()) return;
 	channel_->disableRead();
 	loop_->updateChannle(&*channel_);

@@ -10,6 +10,7 @@
 #include <sys/uio.h>
 #include <arpa/inet.h>
 #include <error.h>
+#include <string.h>
 
 using namespace ChatRoom;
 
@@ -33,6 +34,7 @@ void Connector::stop(){
 }
 
 void Connector::startInloop(){
+	ch_.reset();
 	printf("File: Connector.cc, startInloop function.\n");
 	{
 		printf("File: Connector.cc, startInloop function, update Connect state.\n");
@@ -64,7 +66,8 @@ void Connector::startInloop(){
 	else{
 		printf("File: Connector.cc, startInloop function, Connect First step Succeed.\n");
 		ch_ = std::make_shared<Channel>(sockfd);
-		ch_->setWriteCallback(std::bind(&Connector::handleWrite,this));
+		ch_->setWriteCallback(std::bind(&Connector::handleWrite, this));
+		ch_->setErrorCallback(std::bind(&Connector::handleError, this));
 		ch_->enableWrite();
 		loop_->updateChannle(&*ch_);
 	}
@@ -87,16 +90,31 @@ int Connector::resetChannel(){
 	ch_->disableAll();
 	loop_->updateChannle(&*ch_);
 	loop_->removeChannle(&*ch_);
+	//ch_.reset();
 	return sockfd;
 }
 
 void Connector::handleWrite(){
 	printf("File: Connector.cc, handleWrite function start.\n");
+	if(state_ == kDisConnected) return;
 	int sockfd = resetChannel();
+	int err = getSocketError(sockfd);
+	if(err){
+		printf("File: Connector.cc, handleWrite function, err is %s.\n", strerror(err));
+		closeSocket(sockfd);
+		state_ = kDisConnected;
+		return;
+	}
 	assert(state_ == kConnecting);
 	setState(States(kConnected));
 	//printf("File: Connector.cc, handleWrite function, connCb_ start\n");
 	if(connCb_) connCb_(sockfd);
 	//printf("File: Connector.cc, handleWrite function, connCb_ end\n");
 	printf("File: Connector.cc, handleWrite function end.\n");
+}
+
+void Connector::handleError(){
+	int sockfd = resetChannel();
+	closeSocket(sockfd);
+	state_ = kDisConnected;
 }

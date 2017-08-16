@@ -157,11 +157,11 @@ struct sockaddr ChatRoom::getPeerAddr(int sockfd)
 
 int ChatRoom::getSocketError(int sockfd)
 {
-	int opt = 1;
+	int opt = 0;
 	socklen_t len = sizeof opt;
 	//result deal
 	if (getsockopt(sockfd, SOL_SOCKET, SO_ERROR, (void*)&opt, &len) < 0) return errno;
-	else return opt;
+	else return 0;
 }
 
 int ChatRoom::setNonblock(int sockfd)

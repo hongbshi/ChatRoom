@@ -65,6 +65,7 @@ namespace ChatRoom
 			return name_;
 		}
 
+
 	private:
 		//For Connector 
 		void connectorCb(int sockfd);

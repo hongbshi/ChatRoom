@@ -64,6 +64,11 @@ void TcpProxyServer::newClientCb(TcpProxyClientPtr ptr){
 void TcpProxyServer::closeClientCb(TcpProxyClientPtr ptr){
 	std::string name = ptr->getName();
 	client_.erase(name);
+	TcpConnectionPtr tmp(ptr->getWeakContext().lock());
+	if(tmp && tmp->connected()){
+		EventLoop* ioloop = tmp->getLoop();
+		ioloop->runInLoop(std::bind(&TcpConnection::close, tmp));	
+	}
 }
 
 void TcpProxyServer::removeConnection(TcpConnectionPtr ptr)
@@ -77,8 +82,11 @@ void TcpProxyServer::removeConnectionInLoop(TcpConnectionPtr ptr)
 	conn_.erase(ptr->getName());
 	EventLoop* ioloop = ptr->getLoop();
 	ioloop->runInLoop(std::bind(&TcpConnection::connectDestroyed, ptr));
-	//std::shared_ptr<TcpProxyClient> client = std::static_pointer_cast<TcpProxyClient>(ptr->getContext2());
-	//ioloop->runInLoop(std::bind(&TcpProxyClient::disconnect, client));
+	std::shared_ptr<void> client(ptr->getWeakContext().lock());
+	if(client){
+		std::shared_ptr<TcpProxyClient> tmp = std::static_pointer_cast<TcpProxyClient>(client);
+		if(tmp->isconnect()) tmp->disconnect();
+	}
 }
 
 TcpProxyServer::TcpProxyServer(EventLoop * loop, 

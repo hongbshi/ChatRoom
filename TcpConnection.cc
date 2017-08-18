@@ -136,9 +136,9 @@ void ChatRoom::TcpConnection::handleWrite()
 	printf("File: TcpConnection.cc, TcpConnection::handleWrite function.\n");
 	if(!channel_->isWrite()) return;
 	int savedErrno, result = inputBuffer_.writeSocket(sockfd_, &savedErrno);
+	printf("File: TcpConnection.cc, TcpConnection::handleWrite function, write %d bytes.\n", result);
 	if (result >= 0)
 	{
-		printf("File: TcpConnection.cc, TcpConnection::handleWrite function, write %d bytes.\n", result);
 		if (inputBuffer_.readable() == 0)
 		{
 			channel_->disableWrite();
@@ -156,13 +156,15 @@ void ChatRoom::TcpConnection::handleWrite()
 
 void ChatRoom::TcpConnection::handleError()
 {
-	printf("File: TcpConnection.cc, TcpConnection::handleError function, error is %s.\n", strerror(errno));
+	printf("File: TcpConnection.cc, TcpConnection::handleError function, Error is %s.\n", strerror(errno));
 	//if(errno == ECONNRESET){
 	//	channel_->disableWrite();
 	//	loop_->updateChannle(&*channel_);
 	//	setStates(kDisconnecting);
 	//}
-	handleClose();
+	if((errno == EAGAIN) || (errno == EINPROGRESS) || (errno == EINTR)) return;
+	else handleClose();
+	//handleClose();
 	//if(errno == ECONNRESET) handleClose();
 	//if(channel_->isWrite()){
 	//	channel_->disableWrite();
@@ -185,18 +187,22 @@ void ChatRoom::TcpConnection::handleClose()
 {
 	printf("File: TcpConnection.cc, handleclose function.\n");
 	assert(sockState_ == kConnected || sockState_ == kDisconnecting);
+	bool flag = false;
+	if(!outputBuffer_.isEmpty()){
+		printf("File: TcpConnetion.cc, handleClose function. outputBuff is not empty!\n");
+		flag = true;
+	}
+	if(!inputBuffer_.isEmpty()){
+		printf("File: TcpConnection.cc, handleClose function, inputBuff is not empty!\n");
+		flag = true;
+	}
+	if(flag) exit(-1);
 	//if(sockState_ == kDisconnecting){
 	channel_->disableAll();
 	loop_->updateChannle(&*channel_);
 	setStates(kDisconnected);
 	TcpConnectionPtr guard(shared_from_this());
 	if (closeCallback_) closeCallback_(guard);
-	//}
-	//else{
-	//	setStates(kDisconnecting);
-	//	channel_->disableAll();             		
-	//	loop_->updateChannle(&*channel_);
-	//}
 }
 
 void ChatRoom::TcpConnection::sendInLoop(std::string & s)

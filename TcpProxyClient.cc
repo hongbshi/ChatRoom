@@ -27,7 +27,7 @@ void TcpProxyClient::connect(){
 
 void TcpProxyClient::disconnect(){
 	if(!isConnect_) return;
-	loop_->runInLoop(std::bind(&TcpConnection::connectDestroyed, tcpConn_));
+	loop_->runInLoop(std::bind(&TcpProxyClient::handleClose, this, tcpConn_));
 }
 
 void TcpProxyClient::connectorCb(int sockfd){
@@ -57,10 +57,10 @@ void TcpProxyClient::handleMessage(TcpConnectionPtr ptr, Buffer* buff){
 
 void TcpProxyClient::handleClose(TcpConnectionPtr ptr){
 	if(!isConnect_) return;
+	isConnect_ = false;
 	std::shared_ptr<TcpProxyClient> guard(shared_from_this());
 	loop_->runInLoop(std::bind(&TcpConnection::connectDestroyed, ptr));
 	if(closeCb_) closeCb_(guard);
-	isConnect_ = false;
 	tcpConn_ = nullptr;
 }
 

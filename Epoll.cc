@@ -29,23 +29,18 @@ void Epoll::updateChannel(Channel* ch)
 	 int fd = ch->getfd();
 	 if (status == kNew || status == kDeleted)
 	 {
-		 if (status == kNew)
-			 activeChannel_[fd] = ch;
+		 if (status == kNew) activeChannel_[fd] = ch;
 		 ch->setStatus(kAdded);
-		 //printf("File: Epoll.cc, updateChannel function, Add listen fd %d.\n",ch->getfd());
 		 update(EPOLL_CTL_ADD, ch);
-			
 	 }
 	 else
 	 {
 		 if (ch->isNoneEvent())
 		 {
-			 //printf("File: Epoll.cc, updateChannel function, Delete listen fd %d.\n",ch->getfd());
 			 update(EPOLL_CTL_DEL, ch);
 			 ch->setStatus(kDeleted);
 		 }
 		 else{
-			 //printf("File: Epoll.cc, updateChannel function, Modify  listen fd %d.\n",ch->getfd());
 			 update(EPOLL_CTL_MOD, ch);
 		 }
 	 }
@@ -53,7 +48,7 @@ void Epoll::updateChannel(Channel* ch)
 
 void Epoll::removeChannel(Channel* ch)
 {
-	 printf("File: Epoll.cc, removeChannel function start.\n");
+	 //printf("File: Epoll.cc, removeChannel function start.\n");
 	 int status = ch->getStatus();
 	 int fd = ch->getfd();
 	 assert(status == kAdded || status == kDeleted);
@@ -78,9 +73,12 @@ void Epoll::update(int operation, Channel* ch)
 	memset(&event, 0, sizeof(event));
 	event.events = ch->getEvent();
 	event.data.ptr = ch;
-	//printf("File: Epoll.cc, update function, events is %u.\n",event.events);
+	if(operation == EPOLL_CTL_ADD)
+		printf("File: Epoll.cc, update function, Add listen fd %d.\n", ch->getfd());
+	if(operation == EPOLL_CTL_DEL)
+		printf("File: Epoll.cc, update function, Delete listen fd %d.\n", ch->getfd());
 	if (epoll_ctl(epollfd_, operation, ch->getfd(), &event) < 0){
-		printf("File: Epoll.cc, update function, epoll_ctl error.\n");
+		printf("File: Epoll.cc, update function, epoll_ctl error, error is %s.\n", strerror(errno));
 		abort();
 	}
 }
@@ -94,5 +92,5 @@ void Epoll::fillActiveChannel(int number, std::vector<Channel*>& activeChannel)
 		tmp->setReEvent(event_[i].events);
 		activeChannel.push_back(tmp);
 	}
-	printf("File: Epoll.cc, Epoll::fillActiveChannel function end.\n");
+	//printf("File: Epoll.cc, Epoll::fillActiveChannel function end.\n");
 }

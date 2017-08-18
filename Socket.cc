@@ -26,12 +26,12 @@ int ChatRoom::bindAddress(int sockfd,
 	const struct sockaddr * addr, 
 	socklen_t length)
 {
-	printf("File: Socket.cc, ChatRoom::bindAddress function, bind sockfd is %d.\n", sockfd);
+	//printf("File: Socket.cc, ChatRoom::bindAddress function, bind sockfd is %d.\n", sockfd);
 	const struct sockaddr_in *tmp = sockaddr_in_cast(addr);
 	int port = ntohs(tmp->sin_port);
 	char ip[64];
 	inet_ntop(AF_INET, (const void*)(&(tmp->sin_addr)), ip, 60);
-	printf("File: Socket.cc, ChatRoom::bindAddress function, bind addr is %s:%d.\n", ip,port);
+	printf("File: Socket.cc, ChatRoom::bindAddress function, fd is %d and addr is %s:%d.\n", sockfd, ip, port);
 	return bind(sockfd, addr, length);
 }
 
@@ -77,10 +77,10 @@ ssize_t ChatRoom::readvFromSocket(int sockfd, const iovec * iov, int iovcnt)
 
 ssize_t ChatRoom::writeToSocket(int sockfd, const void * buff, size_t length)
 {
-	printf("File: Socket.cc, writeToSocket function start.\n");
+	//printf("File: Socket.cc, writeToSocket function start.\n");
 	int ans = write(sockfd, buff, length);
-	printf("File: Socket.cc, writeToSocket function, write %d bytes to %d.\n", ans, sockfd);
-	if(ans < 0) printf("File: Socket.cc, writeToSocket function, errno is %s.\n", strerror(errno));
+	//printf("File: Socket.cc, writeToSocket function, write %d bytes to %d.\n", ans, sockfd);
+	//if(ans < 0) printf("File: Socket.cc, writeToSocket function, errno is %s.\n", strerror(errno));
 	return ans;
 }
 

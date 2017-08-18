@@ -14,7 +14,7 @@ namespace ChatRoom
 	public:
 		Epoll();
 		//Add to activeChannel
-		void poll(int timeout,std::vector<Channel*>& activeChannel);
+		void poll(int timeout, std::vector<Channel*>& activeChannel);
 		//If ch.status is kNew or kDeleted, add ch to listen. otherwise update the channel status.
 		void updateChannel(Channel* ch); 
 		//ch must be stay in activeChannel_ ,otherwise assert failed

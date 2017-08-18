@@ -13,7 +13,7 @@ namespace ChatRoom
 {
 	class Channel;
 	class EventLoop;
-	class Connector
+	class Connector: public std::enable_shared_from_this<Connector>
 	{
 	public:
 		typedef std::function<void(int)> ConnCb;

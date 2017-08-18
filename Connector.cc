@@ -66,8 +66,10 @@ void Connector::startInloop(){
 	else{
 		printf("File: Connector.cc, startInloop function, Connect First step Succeed.\n");
 		ch_ = std::make_shared<Channel>(sockfd);
+		//ch_ can not have shared_ptr<Connector>, this can not be substitute with shared_from_this()
 		ch_->setWriteCallback(std::bind(&Connector::handleWrite, this));
 		ch_->setErrorCallback(std::bind(&Connector::handleError, this));
+		ch_->setWeakContext(shared_from_this());
 		ch_->enableWrite();
 		loop_->updateChannle(&*ch_);
 	}

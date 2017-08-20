@@ -14,6 +14,7 @@
 
 #include "TcpProxyClient.h"
 #include "TcpProxyServer.h"
+#include "TcpProxy.h"
 #include "Thread.h"
 #include "HttpServer.h"
 #include "EventLoop.h"
@@ -27,12 +28,12 @@ using namespace std::placeholders;
 using namespace std;
 
 int main(int argc,char *argv[]){
- 	printf("File: TcpProxyServerTest.cc, main funcion, main thread id is %d.\n", getCurrentThreadTid());
+ 	printf("File: TcpProxyTest.cc, main funcion, main thread id is %d.\n", getCurrentThreadTid());
 	EventLoop loop;
 	std::string addrConf = "./AddrConf.txt";
-	TcpProxyServer server(&loop, addrConf);
-	server.start();
-	printf("File: TcpProxyServerTest.cc, main function, main loop start.\n");
+	TcpProxy proxy(&loop, addrConf);
+	proxy.start();
+	printf("File: TcpProxyTest.cc, main function, main loop start.\n");
  	loop.loop();
  	return 0;
 }

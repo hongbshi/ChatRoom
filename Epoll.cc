@@ -15,7 +15,7 @@ void Epoll::poll(int timeout, std::vector<Channel*>& activeChannel)
 {
 	int size = event_.size();
 	int number = epoll_wait(epollfd_, &*event_.begin(), size, timeout);
-	printf("File: Epoll.cc, poll function, Epoll event size is %d.\n", number);
+	//printf("File: Epoll.cc, poll function, Epoll event size is %d.\n", number);
 	if (number > 0) 
 	{
 		fillActiveChannel(number, activeChannel);

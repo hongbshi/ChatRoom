@@ -13,8 +13,7 @@ __thread bool t_loopInThisThread = false;
 
 EventLoop::EventLoop()
 {
-	if (t_loopInThisThread)
-		abort();  //To Do
+	if (t_loopInThisThread) abort();  //To Do
 	kEpollTimeoutMs_ = 1000;
 	tid_ = getCurrentThreadTid();
 	t_loopInThisThread = true;
@@ -26,22 +25,20 @@ EventLoop::EventLoop()
 	wakeupChannel_->enableRead();
 	epoll_ = std::make_shared<Epoll>();
 	epoll_->updateChannel(&*wakeupChannel_);
-	wakeupChannel_->setReadCallback(
-        std::bind(&EventLoop::wakeupChannelReadCallback,this));
+	wakeupChannel_->setReadCallback(std::bind(&EventLoop::wakeupChannelReadCallback,this));
 }
 
 void ChatRoom::EventLoop::loop()
 {
-	if (looping_)
-		abort();  //TO DO
+	if (looping_) abort();  //TO DO
 	looping_ = true;
 	while (!quit_)
 	{
 		activeChannel_.clear();
 		epoll_->poll(kEpollTimeoutMs_, activeChannel_);
-		printf("File: EventLoop.cc, EventLoop::loop function, Current Thread is %d.\n", getCurrentThreadTid());
-		//printf("File: EventLoop.cc, loop function, handle event.\n");
-		for (int i = 0; i < activeChannel_.size(); i++)
+		int len = activeChannel_.size();
+		printf("File: EventLoop.cc, loop function, %d events happend in thread %d.\n", len, tid_);
+		for (int i = 0; i < len; i++)
 		{
 			activeChannel_[i]->handleEvent();
 		}
@@ -77,10 +74,8 @@ bool ChatRoom::EventLoop::isInLoopthread()
 
 void ChatRoom::EventLoop::runInLoop(const Functor & fun)
 {
-	if (isInLoopthread())
-		fun();
-	else
-		queueInLoop(fun);
+	if (isInLoopthread()) fun();
+	else queueInLoop(fun);
 }
 
 void ChatRoom::EventLoop::queueInLoop(const Functor& fun)
@@ -89,8 +84,7 @@ void ChatRoom::EventLoop::queueInLoop(const Functor& fun)
 		MutexLockGuard guard(mutex_);
 		pendingFunctor_.push_back(fun);
 	}
-	if (!isInLoopthread() || !callingPendingFunctors_)
-		wakeup();
+	if (!isInLoopthread() || !callingPendingFunctors_) wakeup();
 }
 
 void ChatRoom::EventLoop::doPendingFunctors()
@@ -102,8 +96,7 @@ void ChatRoom::EventLoop::doPendingFunctors()
 		MutexLockGuard guard(mutex_);
 		tmp.swap(pendingFunctor_);
 	}
-	for (int i = 0; i < tmp.size(); i++)
-		tmp[i]();
+	for (int i = 0; i < tmp.size(); i++) tmp[i]();
 	callingPendingFunctors_ = false;
 }
 

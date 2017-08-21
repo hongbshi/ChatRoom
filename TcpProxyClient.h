@@ -85,6 +85,7 @@ namespace ChatRoom
 		void handleClose(TcpConnectionPtr ptr);
         void handleMessage(TcpConnectionPtr ptr, Buffer* buff);
 		void handleWrite(TcpConnectionPtr ptr);
+		void handleReadZero(TcpConnectionPtr ptr);
 
 		//Variable
 		string name_;

@@ -67,6 +67,7 @@ namespace ChatRoom
 		void removeConnectionInLoop(TcpConnectionPtr ptr);
 		void handleWrite(TcpConnectionPtr ptr);
 		void handleMessage(TcpConnectionPtr ptr, Buffer *buff);
+		void handleReadZero(TcpConnectionPtr ptr);
 
 		//Variable
 		EventLoop* loop_;

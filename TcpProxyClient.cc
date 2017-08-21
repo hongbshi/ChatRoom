@@ -7,7 +7,7 @@
 using namespace ChatRoom;
 using namespace std::placeholders;
 
-int TcpProxyClient::number_ = 0;
+int TcpProxyClient::number_ = 1;
 
 TcpProxyClient::TcpProxyClient(EventLoop *loop, 
 		const struct sockaddr_in & server, 
@@ -76,6 +76,15 @@ void TcpProxyClient::handleClose(TcpConnectionPtr ptr){
 void TcpProxyClient::handleWrite(TcpConnectionPtr ptr){
 	//if(inBuff_.isEmpty()) ptr->stopWrite();
 	//else ptr->send(inBuff_);
+}
+
+void TcpProxyClient::handleReadZero(TcpConnectionPtr ptr){
+	auto spt = weakContext_.lock();
+	if(spt){
+		TcpProxyServerPtr svr = std::static_pointer_cast<TcpProxyServer>(spt);
+		svr->shutdownWrite();
+	}
+	else ptr->close();
 }
 
 void TcpProxyClient::send(Buffer *buff){

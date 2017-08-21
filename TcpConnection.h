@@ -30,6 +30,9 @@ namespace ChatRoom
 		//use getOutputBuffer first
 		typedef std::function<void(TcpConnectionPtr, Buffer*)> MessageCallback;
 
+		//
+		typedef std::function<void(TcpConnectionPtr)> ReadZeroCallback;
+
 		TcpConnection(EventLoop* loop,
 		int sockfd,
 		const struct sockaddr_in * localAddress,
@@ -52,6 +55,10 @@ namespace ChatRoom
 
 		void setMessageCallback(const MessageCallback & cb){
 			messageCallback_ = cb;
+		}
+
+		void setReadZeroCallback(const ReadZeroCallback & cb){
+			readZeroCallback_ = cb;
 		}
 
 		void setStates(sockStates states) { sockState_ = states; }
@@ -130,6 +137,7 @@ namespace ChatRoom
 		CloseCallback closeCallback_;
 		WriteCallback writeCallback_;
 		MessageCallback messageCallback_;
+		ReadZeroCallback readZeroCallback_;
 
 		Buffer inputBuffer_;
 		Buffer outputBuffer_;

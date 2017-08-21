@@ -73,6 +73,14 @@ void TcpProxyServer::handleMessage(TcpConnectionPtr ptr, Buffer *buff){
 	else removeConnection(ptr);
 }
 
+void TcpProxyServer::handleReadZero(TcpConnectionPtr ptr){
+	auto tmp(weakContext_.lock());
+	if(tmp){
+		TcpProxyClientPtr clt = std::static_pointer_cast<TcpProxyClient>(tmp);
+		clt->shutdownWrite();
+	}
+	else removeConnection(ptr);
+}
 
 void TcpProxyServer::send(Buffer *buff){
 	conn_->send(*buff);

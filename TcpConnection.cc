@@ -51,7 +51,7 @@ void ChatRoom::TcpConnection::connectEstablished()
 	channel_->enableRead();
 	channel_->setWeakContext(shared_from_this());
 	loop_->updateChannle(&*channel_);
-	setKeepLive(sockfd_);
+	//setKeepLive(sockfd_);
 	if (connectedCallback_) connectedCallback_(shared_from_this());
 	printf("File: TcpConnection.cc, TcpConnection::connectEstablished function end.\n");
 }
@@ -127,8 +127,11 @@ void ChatRoom::TcpConnection::handleRead()
 	printf("File: TcpConnection.cc, TcpConnection::handleRead function, Read %d bytes.\n", result);
 	//Deal result
 	if (result > 0) messageCallback_(shared_from_this(), &outputBuffer_);
-	else if (result == 0) handleClose();	
-	else if(errno != EAGAIN){
+	else if (result == 0){
+		if(readZeroCallback_ && sockState_ == kConnected) readZeroCallback_(shared_from_this());
+		else handleClose();	
+	}
+	else {
 		errno = savedErrno;
 		handleError();
 	}
@@ -147,7 +150,7 @@ void ChatRoom::TcpConnection::handleWrite()
 			channel_->disableWrite();
 			loop_->updateChannle(&*channel_);
 			if(sockState_ == kDisconnecting){
-				shutdownWrite();
+				shutdownSocket(sockfd_, SHUT_WR);
 			}
 		}
 		if(writeCallback_) writeCallback_(shared_from_this());
@@ -172,10 +175,10 @@ void ChatRoom::TcpConnection::handleClose()
 	printf("File: TcpConnection.cc, handleclose function.\n");
 	assert(sockState_ == kConnected || sockState_ == kDisconnecting);
 	if(!outputBuffer_.isEmpty()){
-		printf("File: TcpConnetion.cc, handleClose function. outputBuff is not empty!\n");
+		printf("File: TcpConnetion.cc, handleClose function, %d was left in oBuff.\n", outputBuffer_.readable());
 	}
 	if(!inputBuffer_.isEmpty()){
-		printf("File: TcpConnection.cc, handleClose function, inputBuff is not empty!\n");
+		printf("File: TcpConnection.cc, handleClose function, %d was left in iBuff.\n", inputBuffer_.readable());
 	}
 	channel_->disableAll();
 	loop_->updateChannle(&*channel_);
@@ -211,7 +214,7 @@ void ChatRoom::TcpConnection::shutdownWriteInLoop(){
 }
 
 void ChatRoom::TcpConnection::closeInLoop(){
-	setStates(kDisconnecting);
+	//setStates(kDisconnecting);
 	handleClose();
 }
 

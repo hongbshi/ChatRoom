@@ -71,16 +71,19 @@ int ChatRoom::Buffer::writeToBuffer(const char * src, int len)
 {
 	if (src == nullptr) return 0;
 	if (writable() < len) {
+		int ls = writeIndex_ - readIndex_;
 		std::vector<char> tmp(2 * (len + store_.capacity()));
 		std::copy(&store_[readIndex_],&store_[writeIndex_],tmp.begin());
 		std::swap(tmp,store_);
+		readIndex_ = 0;
+		writeIndex_ = ls;
 	}
 	memcpy(&store_[writeIndex_], src, len);
 	writeIndex_ += len;
 	return len;
 }
 
-ssize_t ChatRoom::Buffer::readSocket(int sockfd,int* Errno)
+ssize_t ChatRoom::Buffer::readSocket(int sockfd, int* Errno)
 {
 	//Initial variable
 	int len1 = writable();

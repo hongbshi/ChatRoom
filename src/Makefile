@@ -2,17 +2,19 @@ LIB_DIR = ./../lib/
 
 SOURCES = $(wildcard ./*.cc)
 
+INCLUDES = $(wildcard ./*.h)
+
 INCLUDE_DIRS = -I./   
 
 TARGET = libTcpProxy.a 
 
 OBJECTS = $(patsubst %.cc, %.o, $(SOURCES))  
 
-$(TARGET) : $(OBJECTS)  
+$(TARGET) : $(OBJECTS) $(INCLUDES) 
 	$(AR) $(ARFLAG) $@ $^  
 	cp $@ $(LIB_DIR)  
 
-$(OBJECTS) : %.o : %.cc   
+$(OBJECTS) : %.o : %.cc $(INCLUDES) 
 	$(CC) -c $(CFLAGS) $< -o $@ $(INCLUDE_DIRS)  
 
 .PHONY : clean
